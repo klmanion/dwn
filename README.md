@@ -7,7 +7,7 @@ The intention is to preform actions on the file most recently added to the ~/Dow
 The options include moving, opening, returning the path, and other file related operations.
 
 # Installation
-Eventualy there will be an install script, but for now make dwn.sh executable, and move it into your PATH, and dwn.1 into your manpage directory.
+Eventualy there will be an install script, but for now make dwn.sh executable, move it into your PATH, and move dwn.1 into your manpage directory.
 ```
 chmod +x ./dwn.sh
 sudo cp ./dwn.sh /usr/local/bin/dwn
