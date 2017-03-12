@@ -8,8 +8,8 @@ The options include moving, opening, returning the path, and other file related 
 
 # Installation
 Eventualy there will be an install script, but for now make dwn.sh executable, and move it into your PATH, and dwn.1 into your manpage directory.
-[code]
+```
 chmod +x ./dwn.sh
 sudo cp ./dwn.sh /usr/local/bin/dwn
 sudo cp ./dwn.1 /usr/share/man/man1/
-[\code]
+```
