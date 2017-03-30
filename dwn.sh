@@ -29,7 +29,7 @@ version() {
 }
 err() { test -n "$1" && printf 'Err: %s\n' "$1" >&2; exit 65; }
 
-while getopts ":d:a:rlmM:hV" opt "$@"; do
+while getopts ":d:a:rlm:MhV" opt "$@"; do
 	case "$opt" in
 		(d)
 			if [[ ${OPTARG:0:1} == "~" ]]; then
@@ -60,7 +60,7 @@ while getopts ":d:a:rlmM:hV" opt "$@"; do
 			m_flg=1
 			;;
 		(M)
-			mv_dest='.'
+			mv_dest="$PWD"
 			m_flg=1
 			;;
 		(h)
@@ -69,20 +69,23 @@ while getopts ":d:a:rlmM:hV" opt "$@"; do
 		(V)
 			version
 			;;
+		(\?)
+			err 'unknown argument '"$OPTARG"''
+			;;
 	esac
 done
 shift $((OPTIND-1))
 
 test "$#" -gt 0 -a $l_flg -eq 0 && err 'extraneous arguments'
 
-dir=${dir:="~/Downloads"}
+dir="${dir:="$HOME"/Downloads}"
 
-test $m_flg -eq 1 && exec mv "`dwn -rd $dir`" "$mv_dest"
+test $m_flg -eq 1 && exec mv "`dwn -rd "$dir"`" "$mv_dest"
 
-filepath=`stat -f "%B%t%SN" "${dir:-"$HOME"/Downloads}"/* | sort -rn | head -1 | cut -f 2` &>/dev/null
+filepath="`stat -f "%B%t%SN" "${dir}"/* | sort -rn | head -1 | cut -f 2`" &>/dev/null
 test -z "$filepath" && err 'stat command failed'
 test ! -r "$filepath" && err 'most recently downloaded file is unreadable'
-test -d "$filepath" && exec open -R -- "$filepath"
+#test -d "$filepath" && exec open -R -- "$filepath"
 test $r_flg -eq 1 && { echo "$filepath"; exit 0; }
 test $l_flg -eq 1 && exec open "$@" -- "$filepath"
 test "$app_path" && exec open -a "$app_path" -- "$filepath" || exec open -- "$filepath"
