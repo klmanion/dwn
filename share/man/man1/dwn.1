@@ -1,0 +1,104 @@
+\" dwn.1 manpage
+\" .TH DWN 1 16\ May\ 2016 KLM Kurt\ Manion\'s\ Documentation
+.Dd 16 May 2016
+.Dt DWN 1
+.Os UNIX
+.Sh NAME
+.Nm dwn
+.Nd open file most recently added to a folder
+.Sh SYNOPSIS
+.Nm
+.Op Fl d Ar directory
+.Op Fl a Ar application
+.Nm
+.Op Fl r
+.Op Fl d Ar directory
+.Nm
+.Op Fl d Ar directory
+.Op Fl l Ar ...literal_commands
+.Nm
+.Op Fl d Ar directory
+[\fB\-m\fR \fIdestination\fR | \fB\-M\fR]
+.Sh DESCRIPTION
+Using
+.Nm
+without any flags opens the file most recently added to the
+.Pa ~/Downloads
+directory with its default application as specified by the
+.Xr open 1
+command.  The directory, from which the file is chosen, can be changed to any other valid traversable directory with the \fB\-d\fR option.  The application, with which the file is opened, can be changed to any valid executable application with the \fB\-a\fR option.  This summarizes the first mode,
+.Qq normal mode ,
+shown in the Synopsis.
+.Pp
+The second mode,
+.Qq return mode ,
+is initiated when the \fB\-r\fR flag has been applied to the basename
+.Nm .
+Instead of opening the file, return mode dwn writes to stdout the path of the file most recently added to
+.Pa ~/Downloads
+or the directory specified by the following \fB\-d\fR option.  The main purpose of this mode is to be used for piping this filepath to other applications.
+.Pp
+The third mode, "literal mode", is chosen with the \fB\-l\fR flag followed by a list of arguments.  These arguments are passed literally to the
+.Xr open 1
+command, followed by the filepath of the file most recently added to the
+.Pa ~/Downloads
+directory or any other directory specified with the \fB\-d\fR option.  This gives finer control over the circumstances of the opening procedure.
+.Pp
+The fourth mode, "move mode", execs the
+.Xr mv 1
+command, essentialy forming a synonym to `mv "`dwn -r`" \fIdestination\fR'.
+.Sh OPTIONS
+.Bl -hang
+.It Sy Fl a ,
+Specify the application to open the file with.  This can be used the same as
+.Xr open 1 Ns ' Ns
+s \fB\-a\fR option.
+.It Sy Fl d ,
+This overrides the default directory
+.Pa ~/Downloads
+and will return the file most recently added to the supplied directory.
+.It Sy Fl r ,
+The return option tells dwn to print the filepath to stdout, instead of opening the file.  This is designed be used in conjunction with a pipe.  This is mutually exclusive to the \fB\-l\fR option.  If a alternative directory is to be specified one ought use the \fB-rd\fR construct
+.Pq see examples section .
+.It Sy Fl l ,
+All commands following the \fB\-l\fR flag are passed literaly to the
+.Xr open 1
+command, followed by the path of the file most recently added to the specified directory.  Note, since all commands coming after \fB\-l\fR are passed as-is to
+.Xr open 1 ,
+the \fB\-d\fR option _must_ come before the \fB\-l\fR option, lest it be parsed by
+.Xr open 1
+and result in the early termination of the program.
+.El
+.Sh EXAMPLES
+This opens the file most recently added to the desktop in textedit:
+.D1 dwn -d ~/Desktop -a /Applications/TextEdit.app
+.Pp
+or if you're currently in the home directory:
+.D1 dwn -d Desktop -a TextEdit
+.Pp
+TextEdit, there, was also abbreviated; another way to do this is:
+.D1 dwn -d ~/Desktop -l -e
+.Pp
+These two are the same:
+.D1 dwn -l -a /Applications/Safari.app
+.D1 open -a /Applications/Safari.app \fIfile\fR
+and this is also an alternative to simply using dwn's \fB\-a\fR option.  
+.Pp
+This will print the file's contents to the command-line:
+.D1 dwn -d ~/Desktop -r | cat -
+.Pp
+Take advantage of \fB-rd\fR to change the flow of the command's invokation, 
+.D1 dwn -rd ~/Desktop | cat -
+.Pp
+Move the most recently downloaded file to the Documents folder:
+.D1 dwn -m ~/Documents
+.Sh BUGS
+FIXED:Currently this is no support for a -rd option which would allow the user to change the flow of the return mode from: "dwn -d dir -r"; to, "dwn -rd dir".
+.Sh AUTHOR 
+dwn was created by
+.An Kurt L. Manion
+on 3 April 2016.
+.Sh CONTACT
+.Aq klmanion@gmail.com .
+.Sh VERSION
+version 2.7.4 \(em 8 Dec 2016.
