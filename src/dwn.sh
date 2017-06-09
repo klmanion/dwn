@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#lang rash
 #dwn
 #created by: Kurt L. Manion
 #on: 3 April 2016
@@ -13,21 +13,22 @@ version="2.8.1"
 declare r_flg=0
 declare l_flg=0
 declare m_flg=0
+declare name="`basename "${1:-dwn}"`"
 
 usage() {
-	printf '%s\n%s\n%s\n%s\n%s\n' 											\
-		'usage '`basename "${1:-dwn}"`' -- open file most recently added to a folder' 	\
-		'dwn [-d directory] [-a application]' 								\
-		'dwn [-r] -[d directory]' 											\
-		'dwn [-d directory] [-l ...literal_commands]'						\
-		'dwn [-d directory] [-m destination]'								
+	printf '%s\n%s\n%s\n%s\n%s\n' 										\
+		'usage '"$name"' -- open file most recently added to a folder' 	\
+		'dwn [-d directory] [-a application]' 							\
+		'dwn [-r] -[d directory]' 										\
+		'dwn [-d directory] [-l ...literal_commands]'					\
+		'dwn [-d directory] [-m destination]'							
 	exit 64;
 }
 version() {
-	printf '%s\n' 'dwn version '"$version"''
+	printf '%s\n' "$name"' version '"$version"''
 	exit 64;
 }
-err() { test -n "$1" && printf 'Err: %s\n' "$1" >&2; exit 65; }
+err() { test -n "$1" && printf "$name"': Err: %s\n' "$1" >&2; exit 65; }
 
 while getopts ":d:a:rlm:MhV" opt "$@"; do
 	case "$opt" in
@@ -76,18 +77,20 @@ while getopts ":d:a:rlm:MhV" opt "$@"; do
 done
 shift $((OPTIND-1))
 
-test "$#" -gt 0 -a $l_flg -eq 0 && err 'extraneous arguments'
+test $# -gt 0 -a $l_flg -eq 0 && err 'extraneous arguments'
 
-dir="${dir:="$HOME"/Downloads}"
+dir="${dir:=$HOME/Downloads}"
 
 test $m_flg -eq 1 && exec mv "`dwn -rd "$dir"`" "$mv_dest"
 
 filepath="`stat -f "%B%t%SN" "${dir}"/* | sort -rn | head -1 | cut -f 2`" &>/dev/null
+
 test -z "$filepath" && err 'stat command failed'
 test ! -r "$filepath" && err 'most recently downloaded file is unreadable'
 #test -d "$filepath" && exec open -R -- "$filepath"
 test $r_flg -eq 1 && { echo "$filepath"; exit 0; }
 test $l_flg -eq 1 && exec open "$@" -- "$filepath"
-test "$app_path" && exec open -a "$app_path" -- "$filepath" || exec open -- "$filepath"
+test "$app_path" && exec open -a "$app_path" -- "$filepath" \
+	|| exec open -- "$filepath"
 
 # vim: set ts=4 sw=4 noexpandtab:
