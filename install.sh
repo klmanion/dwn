@@ -13,8 +13,8 @@ if [ ! -d "/usr/local/bin/" ]; then
 fi
 
 chmod +x "./dwn.sh"
-cp "./dwn.sh" "/usr/local/bin/dwn"
-cp "./dwn.1" "/usr/share/man/man1/"
+cp "./src/dwn.sh" "/usr/local/bin/dwn"
+cp "./share/man/man1/dwn.1" "/usr/share/man/man1/"
 exit $?;
 
 # vim: set ts=4 sw=4 noexpandtab:
