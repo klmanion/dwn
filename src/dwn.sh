@@ -35,7 +35,7 @@ while getopts ":d:a:rlm:MhV" opt "$@"; do
 		(d)
 			if [[ ${OPTARG:0:1} == "~" ]]; then
 				dir="$HOME""${OPTARG:1}"
-			elif [[ ${OPTARG:0:1} =~ \.\/ ]]; then
+			elif [[ ${OPTARG:0:1} =~ \. ]]; then
 				dir=`pwd`/"$OPTARG"
 			else
 				dir="$OPTARG"
