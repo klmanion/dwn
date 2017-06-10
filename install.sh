@@ -12,7 +12,7 @@ if [ ! -d "/usr/local/bin/" ]; then
 	[ $? -ne 0 ] && exit 1;
 fi
 
-chmod +x "./dwn.sh"
+chmod +x "./src/dwn.sh"
 cp "./src/dwn.sh" "/usr/local/bin/dwn"
 cp "./share/man/man1/dwn.1" "/usr/share/man/man1/"
 exit $?;

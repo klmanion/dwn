@@ -10,15 +10,19 @@
 .Nm
 .Op Fl d Ar directory
 .Op Fl a Ar application
+.Op Fl n Ar num_files
 .Nm
 .Op Fl r
 .Op Fl d Ar directory
+.Op Fl n Ar num_files
 .Nm
 .Op Fl d Ar directory
+.Op Fl n Ar num_files
 .Op Fl l Ar ...literal_commands
 .Nm
 .Op Fl d Ar directory
 [\fB\-m\fR \fIdestination\fR | \fB\-M\fR]
+.Op Fl n Ar num_files
 .Sh DESCRIPTION
 Using
 .Nm
@@ -60,6 +64,14 @@ and will return the file most recently added to the supplied directory.
 .It Sy Fl r ,
 The return option tells dwn to print the filepath to stdout, instead of opening the file.  This is designed be used in conjunction with a pipe.  This is mutually exclusive to the \fB\-l\fR option.  If a alternative directory is to be specified one ought use the \fB-rd\fR construct
 .Pq see examples section .
+.It Sy Fl m ,
+The move option moves the file to the specified directory, instead of opening it.
+.It Sy Fl M ,
+An alias for ``dwn -m .''.  Moves file to the current working directory.
+.It Sy Fl n ,
+Given a numeric argument, instead of operating on one file, operates on the specified number of files.  If there are less than that number of files in the directory
+.Nm
+simply operates on the present files.
 .It Sy Fl l ,
 All commands following the \fB\-l\fR flag are passed literaly to the
 .Xr open 1
@@ -92,6 +104,9 @@ Take advantage of \fB-rd\fR to change the flow of the command's invokation,
 .Pp
 Move the most recently downloaded file to the Documents folder:
 .D1 dwn -m ~/Documents
+.Pp
+Move the 5 most recently downloaded files to the Documents folder.
+.D1 dwn -m ~/Documents -n 5
 .Sh BUGS
 FIXED:Currently this is no support for a -rd option which would allow the user to change the flow of the return mode from: "dwn -d dir -r"; to, "dwn -rd dir".
 .Sh AUTHOR 
@@ -101,4 +116,4 @@ on 3 April 2016.
 .Sh CONTACT
 .Aq klmanion@gmail.com .
 .Sh VERSION
-version 2.7.4 \(em 8 Dec 2016.
+version 2.9.0 \(em 10 Jun 2017.
