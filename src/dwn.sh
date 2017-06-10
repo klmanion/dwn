@@ -20,10 +20,10 @@ declare name="`basename "${0:-dwn}"`"
 usage() {
 	printf '%s\n%s\n%s\n%s\n%s\n' 										\
 		'usage '"$name"' -- open file most recently added to a folder' 	\
-		"$name"' [-n num_files] [-d directory] [-a application]' 		\
-		"$name"' [-n num_files] [-r] [-d directory]' 					\
-		"$name"' [-n num_files] [-d directory] [-l ...literal_commands]'\
-		"$name"' [-n num_files] [-d directory] [-m destination]'							
+		"$name"' [-d directory] [-a application] [-n num_files]' 		\
+		"$name"' [-r] [-d directory] [-n num_files]'  					\
+		"$name"' [-d directory] [-n num_files] [-l ...literal_commands]'\
+		"$name"' [-d directory] [-m destination | -M] [-n num_files]'
 	exit 64;
 }
 version() {
