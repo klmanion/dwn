@@ -3,12 +3,13 @@
 #created by: Kurt L. Manion
 #on: 3 April 2016
 #last modified: 12 March 2016
-version="2.8.2"
+version="2.9.0"
 
 #patch note: in 2.6.4 fixed bug for -a flag
 #patch note: in 2.7.1 added -m flag
 #patch note: in 2.8.1 flag command flow was updated to modern bash syntax
 #	and project was added to github
+#patch note: in 2.9.0 added the -n option
 
 declare r_flg=0
 declare l_flg=0
@@ -60,7 +61,6 @@ while getopts ":d:a:rlm:Mn:hV" opt "$@"; do
 		(m)
 			mv_dest="$OPTARG"
 			m_flg=1
-			#FIXME: test to see if mv_dest is a existing writtable directory
 			;;
 		(M)
 			mv_dest="$PWD"
@@ -92,20 +92,25 @@ dir="${dir:=$HOME/Downloads}" #FIXME: there's a better way to do this
 
 test $m_flg -eq 1 && exec mv "`dwn -rd "$dir"`" "$mv_dest"
 
-filepath_lst="`stat -f "%B%t%SN" "${dir}"/* | sort -rn | head -$num_files | cut -f 2`" &>/dev/null
+filepath_lst="`stat -f "%B%t%SN" "${dir}"/* | sort -rn | head -$num_files | cut -f 2 | tr '\n' '\t'`" &>/dev/null
+
+IFS=$'\t'
 read -r -a filepath_arr <<< "$filepath_lst"
 
 for filepath in "${filepath_arr[@]}"; do
 
 	test -z "$filepath" && err 'stat command failed'
-	#test -d "$filepath" && exec open -R -- "$filepath"
-	test $r_flg -eq 1 && { echo "$filepath"; continue }
+	#test -d "$filepath" && open -R -- "$filepath"
+	test $r_flg -eq 1 && { echo "$filepath"; continue; }
 	test ! -r "$filepath" && err 'most recently downloaded file is unreadable'
-	test $l_flg -eq 1 && open "$@" -- "$filepath"
-	test "$app_path" && open -a "$app_path" -- "$filepath" \
+	if [ $l_flg -eq 1 ]; then
+		test -n "$app_path" && open -a "$app_path" -- "$filepath" \
+			|| open "$@" -- "$filepath"
+	fi
+	test -n "$app_path" && open -a "$app_path" -- "$filepath" \
 		|| open -- "$filepath"
-	#FIXME: ^ this doesn't look right (ln. 106)
 
 done
 
+exit 0;
 # vim: set ts=4 sw=4 noexpandtab:
