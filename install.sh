@@ -4,7 +4,7 @@
 
 if [ $(id -u) -ne 0 ]; then
 	printf 'this script must be run as root\n' >&2
-	exit 1;
+	exec sudo "$0" $*
 fi
 
 if [ ! -d "/usr/local/bin/" ]; then
