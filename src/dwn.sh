@@ -93,7 +93,7 @@ dir="${dir:=$HOME/Downloads}" #FIXME: there's a better way to do this
 test $m_flg -eq 1 && exec mv "`dwn -rd "$dir"`" "$mv_dest"
 
 filepath_lst="`stat --format "%B %n" "${dir}"/* | sort -rn \
-	| head -$num_files | cut -f 2 | tr '\n' '\t'`" &>/dev/null
+	| head -$num_files | cut -d ' ' -f 2 | tr '\n' '\t'`" &>/dev/null
 
 IFS=$'\t'
 read -r -a filepath_arr <<< "$filepath_lst"
