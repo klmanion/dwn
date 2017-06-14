@@ -3,7 +3,7 @@
 #created by: Kurt L. Manion
 #on: 3 April 2016
 #last modified: 12 March 2016
-version="2.9.1"
+version="2.9.2"
 
 #patch note: in 2.6.4 fixed bug for -a flag
 #patch note: in 2.7.1 added -m flag
@@ -92,7 +92,8 @@ dir="${dir:=$HOME/Downloads}" #FIXME: there's a better way to do this
 
 test $m_flg -eq 1 && exec mv "`dwn -rd "$dir"`" "$mv_dest"
 
-filepath_lst="`stat -f "%B%t%SN" "${dir}"/* | sort -rn | head -$num_files | cut -f 2 | tr '\n' '\t'`" &>/dev/null
+filepath_lst="`stat --format "%B %n" "${dir}"/* | sort -rn \
+	| head -$num_files | cut -f 2 | tr '\n' '\t'`" &>/dev/null
 
 IFS=$'\t'
 read -r -a filepath_arr <<< "$filepath_lst"
