@@ -11,6 +11,9 @@ version="2.9.2"
 #	and project was added to github
 #patch note: in 2.9.0 added the -n option
 
+#on kali linux the stat version's first line is
+#stat (GNU coreutils) 8.25
+
 declare r_flg=0
 declare l_flg=0
 declare m_flg=0
@@ -92,8 +95,8 @@ dir="${dir:=$HOME/Downloads}" #FIXME: there's a better way to do this
 
 test $m_flg -eq 1 && exec mv "`dwn -rd "$dir"`" "$mv_dest"
 
-filepath_lst="`stat --format "%B %n" "${dir}"/* | sort -rn \
-	| head -$num_files | cut -d ' ' -f 2 | tr '\n' '\t'`" &>/dev/null
+filepath_lst="`stat --format "%B"$'\t'"%N" "${dir}"/* | sort -rn \
+	| head -$num_files | cut -d $'\t' -f 2 | tr '\n' '\t'`" &>/dev/null
 
 IFS=$'\t'
 read -r -a filepath_arr <<< "$filepath_lst"
