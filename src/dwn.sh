@@ -95,7 +95,12 @@ dir="${dir:=$HOME/Downloads}" #FIXME: there's a better way to do this
 
 test $m_flg -eq 1 && exec mv "`dwn -rd "$dir"`" "$mv_dest"
 
-filepath_lst="`stat --format "%B"$'\t'"%N" "${dir}"/* | sort -rn \
+#the first is Darwin, and the second is GNU stat
+stat --version &>/dev/null \
+	&& stat_cmd='stat --format "%B"$\t"%N" "${dir}"/*' \
+	|| stat_cmd='stat -f "%B%t%N" "${dir}"/*'
+
+filepath_lst="`eval "$stat_cmd" | sort -rn \
 	| head -$num_files | cut -d $'\t' -f 2 | tr '\n' '\t'`" &>/dev/null
 
 IFS=$'\t'
