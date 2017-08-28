@@ -97,28 +97,35 @@ test $m_flg -eq 1 && exec mv "`dwn -rd "$dir"`" "$mv_dest"
 
 #the first is Darwin, and the second is GNU stat
 stat --version &>/dev/null \
-	&& stat_cmd='stat --format "%B"$\t"%N" "${dir}"/*' \
+	&& stat_cmd='stat --printf "%B\t%n\n" "${dir}"/*' \
 	|| stat_cmd='stat -f "%B%t%N" "${dir}"/*'
 
-filepath_lst="`eval "$stat_cmd" | sort -rn \
-	| head -$num_files | cut -d $'\t' -f 2 | tr '\n' '\t'`" &>/dev/null
+filepath_lst="`eval "$stat_cmd" | sort -rn | head -$num_files \
+	| cut -d $'\t' -f 2 | tr '\n' '\t'`" &>/dev/null
 
 IFS=$'\t'
 read -r -a filepath_arr <<< "$filepath_lst"
 
+if [[ x"$OSTYPE" == x"linux-gnu" ]]; then
+	open_cmd="xdg-open"
+elif [[ x"$OSTYPE" == x"darwin*" ]]; then
+	open_cmd="open"
+else
+	open_cmd="open"
+fi
+
 for filepath in "${filepath_arr[@]}"; do
 
 	test -z "$filepath" && err 'stat command failed'
-	#test -d "$filepath" && open -R -- "$filepath"
+	#test -d "$filepath" && $open_cmd -R "$filepath"
 	test $r_flg -eq 1 && { echo "$filepath"; continue; }
 	test ! -r "$filepath" && err 'most recently downloaded file is unreadable'
 	if [ $l_flg -eq 1 ]; then
-		test -n "$app_path" && open -a "$app_path" -- "$filepath" \
-			|| open "$@" -- "$filepath"
+		test -n "$app_path" && $open_cmd -a "$app_path" "$filepath" \
+			|| $open_cmd "$@" "$filepath"
 	fi
-	test -n "$app_path" && open -a "$app_path" -- "$filepath" \
-		|| open -- "$filepath"
-
+	test -n "$app_path" && $open_cmd -a "$app_path" "$filepath" \
+		|| $open_cmd "$filepath"
 done
 
 exit 0;
