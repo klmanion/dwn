@@ -3,13 +3,16 @@
 #created by: Kurt L. Manion
 #on: 3 April 2016
 #last modified: 12 March 2016
-version="2.9.1"
+version="2.9.2"
 
 #patch note: in 2.6.4 fixed bug for -a flag
 #patch note: in 2.7.1 added -m flag
 #patch note: in 2.8.1 flag command flow was updated to modern bash syntax
 #	and project was added to github
 #patch note: in 2.9.0 added the -n option
+
+#on kali linux the stat version's first line is
+#stat (GNU coreutils) 8.25
 
 declare r_flg=0
 declare l_flg=0
@@ -92,24 +95,37 @@ dir="${dir:=$HOME/Downloads}" #FIXME: there's a better way to do this
 
 test $m_flg -eq 1 && exec mv "`dwn -rd "$dir"`" "$mv_dest"
 
-filepath_lst="`stat -f "%B%t%SN" "${dir}"/* | sort -rn | head -$num_files | cut -f 2 | tr '\n' '\t'`" &>/dev/null
+#the first is Darwin, and the second is GNU stat
+stat --version &>/dev/null \
+	&& stat_cmd='stat --printf "%B\t%n\n" "${dir}"/*' \
+	|| stat_cmd='stat -f "%B%t%N" "${dir}"/*'
+
+filepath_lst="`eval "$stat_cmd" | sort -rn | head -$num_files \
+	| cut -d $'\t' -f 2 | tr '\n' '\t'`" &>/dev/null
 
 IFS=$'\t'
 read -r -a filepath_arr <<< "$filepath_lst"
 
+if [[ x"$OSTYPE" == x"linux-gnu" ]]; then
+	open_cmd="xdg-open"
+elif [[ x"$OSTYPE" == x"darwin*" ]]; then
+	open_cmd="open"
+else
+	open_cmd="open"
+fi
+
 for filepath in "${filepath_arr[@]}"; do
 
 	test -z "$filepath" && err 'stat command failed'
-	#test -d "$filepath" && open -R -- "$filepath"
+	#test -d "$filepath" && $open_cmd -R "$filepath"
 	test $r_flg -eq 1 && { echo "$filepath"; continue; }
 	test ! -r "$filepath" && err 'most recently downloaded file is unreadable'
 	if [ $l_flg -eq 1 ]; then
-		test -n "$app_path" && open -a "$app_path" -- "$filepath" \
-			|| open "$@" -- "$filepath"
+		test -n "$app_path" && $open_cmd -a "$app_path" "$filepath" \
+			|| $open_cmd "$@" "$filepath"
 	fi
-	test -n "$app_path" && open -a "$app_path" -- "$filepath" \
-		|| open -- "$filepath"
-
+	test -n "$app_path" && $open_cmd -a "$app_path" "$filepath" \
+		|| $open_cmd "$filepath"
 done
 
 exit 0;
