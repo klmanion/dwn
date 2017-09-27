@@ -68,7 +68,7 @@ while getopts ":d:a:rlm:Mn:hV" opt "$@"; do
 			;;
 		(n)
 			num_files="$OPTARG"
-			test -n "`echo "$num_files" | sed -e 's/[0-9]//'`" && \
+			test -n "`echo "$num_files" | sed -e 's/[0-9]*//'`" && \
 				err '-n takes only numeric arguments'
 			test "$num_files" -lt 1 && \
 				err 'number of files must be set to at least 1' 
