@@ -3,7 +3,7 @@
 #created by: Kurt L. Manion
 #on: 3 April 2016
 #last modified: 12 March 2016
-version="2.9.3"
+version="2.9.4"
 
 #patch note: in 2.6.4 fixed bug for -a flag
 #patch note: in 2.7.1 added -m flag
@@ -93,8 +93,6 @@ test $# -gt 0 -a $l_flg -eq 0 && err 'extraneous arguments'
 
 dir="${dir:=$HOME/Downloads}" #FIXME: there's a better way to do this
 
-test $m_flg -eq 1 && exec mv "`dwn -rd "$dir"`" "$mv_dest"
-
 #the first is Darwin, and the second is GNU stat
 stat --version &>/dev/null \
 	&& stat_cmd='stat --printf "%B\t%n\n" "${dir}"/*' \
@@ -118,6 +116,7 @@ for filepath in "${filepath_arr[@]}"; do
 
 	test -z "$filepath" && err 'stat command failed'
 	#test -d "$filepath" && $open_cmd -R "$filepath"
+	test $m_flg -eq 1 && { mv "$filepath" "$mv_dest"; continue; }
 	test $r_flg -eq 1 && { echo "$filepath"; continue; }
 	test ! -r "$filepath" && err 'most recently downloaded file is unreadable'
 	if [ $l_flg -eq 1 ]; then
