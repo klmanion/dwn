@@ -2,8 +2,8 @@
 #dwn
 #created by: Kurt L. Manion
 #on: 3 April 2016
-#last modified: 12 March 2016
-version="2.9.4"
+#last modified: 29 April 2018
+version="2.10.1"
 
 #patch note: in 2.6.4 fixed bug for -a flag
 #patch note: in 2.7.1 added -m flag
@@ -17,6 +17,7 @@ version="2.9.4"
 declare r_flg=0
 declare l_flg=0
 declare m_flg=0
+declare mv_flgs="-n"
 declare num_files=1
 declare name="`basename "${0:-dwn}"`"
 
@@ -26,7 +27,7 @@ usage() {
 		"$name"' [-d directory] [-a application] [-n num_files]' 		\
 		"$name"' [-r] [-d directory] [-n num_files]'  					\
 		"$name"' [-d directory] [-n num_files] [-l ...literal_commands]'\
-		"$name"' [-d directory] [-m destination | -M] [-n num_files]'
+		"$name"' [-d directory] [-m destination | -M] [-f] [-n num_files]'
 	exit 64;
 }
 version() {
@@ -35,7 +36,7 @@ version() {
 }
 err() { test -n "$1" && printf "$name"': Err: %s\n' "$1" >&2; exit 65; }
 
-while getopts ":d:a:rlm:Mn:hV" opt "$@"; do
+while getopts ":d:a:rlm:Mfin:hV" opt "$@"; do
 	case "$opt" in
 		(d)
 			if [[ ${OPTARG:0:1} == "~" ]]; then
@@ -69,6 +70,12 @@ while getopts ":d:a:rlm:Mn:hV" opt "$@"; do
 			mv_dest="$PWD"
 			m_flg=1
 			;;
+		(f)
+			mv_flgs="-f"
+			;;
+		(i)
+			mv_flgs="-i"
+			;;
 		(n)
 			num_files="$OPTARG"
 			test -n "`echo "$num_files" | sed -e 's/[0-9]*//'`" && \
@@ -92,6 +99,8 @@ shift $((OPTIND-1))
 test $# -gt 0 -a $l_flg -eq 0 && err 'extraneous arguments'
 
 dir="${dir:=$HOME/Downloads}" #FIXME: there's a better way to do this
+
+test $m_flg -eq 1 && exec mv "$mv_flgs" "`dwn -rd "$dir"`" "$mv_dest"
 
 #the first is Darwin, and the second is GNU stat
 stat --version &>/dev/null \
