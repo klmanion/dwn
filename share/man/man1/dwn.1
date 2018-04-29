@@ -21,7 +21,8 @@
 .Op Fl l Ar ...literal_commands
 .Nm
 .Op Fl d Ar directory
-[\fB\-m\fR \fIdestination\fR | \fB\-M\fR]
+.Op Fl m Ar destination | Fl M
+.Op Fl f | Fl i
 .Op Fl n Ar num_files
 .Sh DESCRIPTION
 Using
@@ -50,7 +51,11 @@ directory or any other directory specified with the \fB\-d\fR option.  This give
 .Pp
 The fourth mode, "move mode", execs the
 .Xr mv 1
-command, essentialy forming a synonym to `mv "`dwn -r`" \fIdestination\fR'.
+command, essentially forming a synonym to `mv "`dwn -r`" \fIdestination\fR'.
+.Nm
+does not overwrite any file by default;
+the \fB\-f\fR or \fB\-i\fR flag must be specified to force an overwrite.
+
 .Sh OPTIONS
 .Bl -hang
 .It Sy Fl a ,
@@ -67,7 +72,15 @@ The return option tells dwn to print the filepath to stdout, instead of opening 
 .It Sy Fl m ,
 The move option moves the file to the specified directory, instead of opening it.
 .It Sy Fl M ,
-An alias for ``dwn -m .''.  Moves file to the current working directory.
+An alias for `dwn -m .'.  Moves file to the current working directory.
+.It Sy Fl f ,
+Force 
+.Xr mv 1
+to overwrite any file if an overwrite would occur.
+(This only has effect if a move option is in use.)
+.It Sy Fl i ,
+Prompt the user for confirmation if a move would cause another file to be overwritten.
+(This only has effect if a move option is in use.)
 .It Sy Fl n ,
 Given a numeric argument, instead of operating on one file, operates on the specified number of files.  If there are less than that number of files in the directory
 .Nm
