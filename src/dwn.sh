@@ -100,8 +100,6 @@ test $# -gt 0 -a $l_flg -eq 0 && err 'extraneous arguments'
 
 dir="${dir:=$HOME/Downloads}" #FIXME: there's a better way to do this
 
-test $m_flg -eq 1 && exec mv "$mv_flgs" "`dwn -rd "$dir"`" "$mv_dest"
-
 #the first is Darwin, and the second is GNU stat
 stat --version &>/dev/null \
 	&& stat_cmd='stat --printf "%B\t%n\n" "${dir}"/*' \
@@ -122,17 +120,22 @@ else
 fi
 
 for filepath in "${filepath_arr[@]}"; do
-
 	test -z "$filepath" && err 'stat command failed'
 	#test -d "$filepath" && $open_cmd -R "$filepath"
 	test $r_flg -eq 1 && { echo "$filepath"; continue; }
 	test ! -r "$filepath" && err 'most recently downloaded file is unreadable'
+
 	if [ $l_flg -eq 1 ]; then
-		test -n "$app_path" && $open_cmd -a "$app_path" "$filepath" \
+		test -n "$app_path" \
+			&& $open_cmd -a "$app_path" "$filepath" \
 			|| $open_cmd "$@" "$filepath"
+	elif [ $m_flg -eq 1 ]; then
+		mv "$mv_flgs" "`dwn -rd "$dir"`" "$mv_dest"
+	else
+		test -n "$app_path" \
+			&& $open_cmd -a "$app_path" "$filepath" \
+			|| $open_cmd "$filepath"
 	fi
-	test -n "$app_path" && $open_cmd -a "$app_path" "$filepath" \
-		|| $open_cmd "$filepath"
 done
 
 exit 0;
