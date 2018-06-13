@@ -122,6 +122,7 @@ fi
 for filepath in "${filepath_arr[@]}"; do
 	test -z "$filepath" && err 'stat command failed'
 	#test -d "$filepath" && $open_cmd -R "$filepath"
+	test $m_flg -eq 1 && { mv "$filepath" "$mv_dest"; continue; }
 	test $r_flg -eq 1 && { echo "$filepath"; continue; }
 	test ! -r "$filepath" && err 'most recently downloaded file is unreadable'
 
