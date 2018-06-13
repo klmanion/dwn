@@ -2,8 +2,8 @@
 #dwn
 #created by: Kurt L. Manion
 #on: 3 April 2016
-#last modified: 29 April 2018
-version="2.10.2"
+#last modified: 13 June 2018
+version="2.11.1"
 
 #patch note: in 2.6.4 fixed bug for -a flag
 #patch note: in 2.7.1 added -m flag
