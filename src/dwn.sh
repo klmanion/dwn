@@ -3,7 +3,7 @@
 #created by: Kurt L. Manion
 #on: 3 April 2016
 #last modified: 29 April 2018
-version="2.10.1"
+version="2.10.2"
 
 #patch note: in 2.6.4 fixed bug for -a flag
 #patch note: in 2.7.1 added -m flag
@@ -130,7 +130,7 @@ for filepath in "${filepath_arr[@]}"; do
 			&& $open_cmd -a "$app_path" "$filepath" \
 			|| $open_cmd "$@" "$filepath"
 	elif [ $m_flg -eq 1 ]; then
-		mv "$mv_flgs" "`dwn -rd "$dir"`" "$mv_dest"
+		mv "$mv_flgs" "`dwn -rd $dir`" "$mv_dest"
 	else
 		test -n "$app_path" \
 			&& $open_cmd -a "$app_path" "$filepath" \
@@ -139,4 +139,5 @@ for filepath in "${filepath_arr[@]}"; do
 done
 
 exit 0;
+
 # vim: set ts=4 sw=4 noexpandtab:
