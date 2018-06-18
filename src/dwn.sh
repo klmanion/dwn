@@ -3,7 +3,7 @@
 #created by: Kurt L. Manion
 #on: 3 April 2016
 #last modified: 13 June 2018
-version="2.11.1"
+version="2.11.2"
 
 #patch note: in 2.6.4 fixed bug for -a flag
 #patch note: in 2.7.1 added -m flag
@@ -98,7 +98,7 @@ shift $((OPTIND-1))
 
 test $# -gt 0 -a $l_flg -eq 0 && err 'extraneous arguments'
 
-dir="${dir:=$HOME/Downloads}" #FIXME: there's a better way to do this
+: ${dir:="$HOME/Downloads"}
 
 #the first is Darwin, and the second is GNU stat
 stat --version &>/dev/null \
