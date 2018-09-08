@@ -78,6 +78,8 @@ while getopts ":d:rn:fm:MohV" opt "$@"; do
 	(m)
 		cmd="mv"
 
+		cmd_flgs="$cmd_flgs -n"
+
 		cmd_post="$OPTARG"
 		;;
 	(M)
