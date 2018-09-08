@@ -3,7 +3,7 @@
 #created by: Kurt L. Manion
 #on: 3 April 2016
 #last modified: 13 June 2018
-version="3.0.0"
+version="3.0.1"
 
 #patch note: in 2.6.4 fixed bug for -a flag
 #patch note: in 2.7.1 added -m flag
@@ -33,11 +33,18 @@ usage() {
 			'[-f flags] [-n num_files]'
 	exit 64;
 }
+
 version() {
 	printf '%s\n' "$name"' version '"$version"''
 	exit 64;
 }
-err() { test -n "$1" && printf "$name"': Err: %s\n' "$1" >&2; exit 65; }
+
+err() {
+	test -n "$1" \
+		&& printf "$name"': Err: %s\n' "$1" >&2 \
+		|| printf "$name"': Err\n' >&2
+	exit 65;
+}
 
 while getopts ":d:a:rlm:Mfin:hV" opt "$@"; do
 	case "$opt" in
