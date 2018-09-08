@@ -3,13 +3,14 @@
 #created by: Kurt L. Manion
 #on: 3 April 2016
 #last modified: 13 June 2018
-version="2.11.2"
+version="3.0.0"
 
 #patch note: in 2.6.4 fixed bug for -a flag
 #patch note: in 2.7.1 added -m flag
 #patch note: in 2.8.1 flag command flow was updated to modern bash syntax
 #	and project was added to github
 #patch note: in 2.9.0 added the -n option
+#patch note: in 3.0 -r becomes the default behavior, and -o is introduced
 
 #on kali linux the stat version's first line is
 #stat (GNU coreutils) 8.25
@@ -22,12 +23,14 @@ declare num_files=1
 declare name="`basename "${0:-dwn}"`"
 
 usage() {
-	printf '%s\n%s\n%s\n%s\n%s\n' 										\
-		'usage '"$name"' -- open file most recently added to a folder' 	\
-		"$name"' [-d directory] [-a application] [-n num_files]' 		\
-		"$name"' [-r] [-d directory] [-n num_files]'  					\
-		"$name"' [-d directory] [-n num_files] [-l ...literal_commands]'\
-		"$name"' [-d directory] [-m destination | -M] [-f] [-n num_files]'
+	printf '%s%s\n%s\n%s%s\n%s%s\n' 					\
+		'usage: '"$name"' -- return path of file most recently '	\
+			'added to a folder' 				\
+		"$name"' [-r] [-d directory] [-n num_files]'  		\
+		"$name"' [-r] [-d directory] [-o application] '		\
+			'[-f flags] [-n num_files]'			\
+		"$name"' [-r] [-d directory] [-m destination | -M] '	\
+			'[-f flags] [-n num_files]'
 	exit 64;
 }
 version() {
@@ -141,4 +144,4 @@ done
 
 exit 0;
 
-# vim: set ts=4 sw=4 noexpandtab:
+# vim: set ts=8 sw=8 noexpandtab tw=79:
