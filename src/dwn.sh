@@ -75,6 +75,15 @@ while getopts ":d:rn:fm:MohV" opt "$@"; do
 	(f)
 		cmd_flgs="$cmd_flgs $OPTARG"
 		;;
+	(o)
+		if [[ x"$OSTYPE" == x"linux-gnu" ]]; then
+			cmd="xdg-open"
+		elif [[ x"$OSTYPE" == x"darwin*" ]]; then
+			cmd="open"
+		else
+			cmd="open"
+		fi
+		;;
 	(m)
 		cmd="mv"
 
@@ -88,15 +97,6 @@ while getopts ":d:rn:fm:MohV" opt "$@"; do
 		cmd_flgs="$cmd_flgs -n"
 
 		cmd_post="$PWD"
-		;;
-	(o)
-		if [[ x"$OSTYPE" == x"linux-gnu" ]]; then
-			cmd="xdg-open"
-		elif [[ x"$OSTYPE" == x"darwin*" ]]; then
-			cmd="open"
-		else
-			cmd="open"
-		fi
 		;;
 	(h)
 		usage
