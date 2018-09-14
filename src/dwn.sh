@@ -3,7 +3,7 @@
 #created by: Kurt L. Manion
 #on: 3 April 2016
 #last modified: 13 June 2018
-version="3.0.2"
+version="3.0.4"
 
 #patch note: in 2.6.4 fixed bug for -a flag
 #patch note: in 2.7.1 added -m flag
@@ -15,7 +15,7 @@ version="3.0.2"
 #on kali linux the stat version's first line is
 #stat (GNU coreutils) 8.25
 
-declare cmd=""
+declare cmd="echo"
 declare cmd_flgs=""
 declare cmd_post=""
 
@@ -51,9 +51,9 @@ while getopts ":d:rn:fm:MohV" opt "$@"; do
 	case "$opt" in
 	(d)
 		if [[ x${OPTARG:0:1} == x"~" ]]; then
-			dir="$HOME""${OPTARG:1}"
+			dir="$HOME${OPTARG:1}"
 		elif [[ x${OPTARG:0:1} =~ x"\." ]]; then
-			dir=`pwd`/"$OPTARG"
+			dir="`pwd`/$OPTARG"
 		else
 			dir="$OPTARG"
 		fi
@@ -61,7 +61,7 @@ while getopts ":d:rn:fm:MohV" opt "$@"; do
 		test ! -d "$dir" && err 'directory does not exist'
 		;;
 	(r)
-		cmd=""
+		cmd="echo"
 		cmd_flgs=""
 		cmd_post=""
 		;;
@@ -129,9 +129,19 @@ read -r -a filepath_arr <<< "$filepath_lst"
 for filepath in "${filepath_arr[@]}"; do
 	test -z "$filepath" && err 'stat command failed'
 
-	test -z "$cmd" \
-		&& echo "$filepath" \
-		|| $cmd "$cmd_flgs" "$filepath" "$cmd_post"
+	if [ -n "$cmd_flgs" ]; then
+		if [ -n "$cmd_post" ]; then
+			(exec $cmd "$cmd_flgs" "$filepath" "$cmd_post" &)
+		else
+			(exec $cmd "$cmd_flgs" "$filepath" &)
+		fi
+	else
+		if [ -n "$cmd_post" ]; then
+			(exec $cmd "$filepath" "$cmd_post" &)
+		else
+			(exec $cmd "$filepath" &)
+		fi
+	fi
 done
 
 exit 0;
