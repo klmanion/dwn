@@ -169,7 +169,7 @@ skip_dex() {
 	return $neg_flg;
 }
 
-while getopts ":d:rn:fom:MS:hV" opt "$@"; do
+while getopts ":d:rn:fom:MS:s:hV" opt "$@"; do
 	case "$opt" in
 	(d)
 		if [[ ${OPTARG:0:1} == ~ ]]; then
@@ -189,10 +189,10 @@ while getopts ":d:rn:fom:MS:hV" opt "$@"; do
 		;;
 	(n)
 		num_files="$OPTARG"
-		test -n "`echo "$num_files" | sed -e 's/[0-9]*//'`" && \
-			err '-n takes only numeric arguments'
-		test "$num_files" -lt 1 && \
-			err 'number of files must be set to at least 1' 
+		test -n "`echo "$num_files" | sed -e 's/[0-9]*//'`" \
+			&& err '-n takes only numeric arguments'
+		test "$num_files" -lt 1 \
+			&& err 'number of files must be set to at least 1' 
 		;;
 	(f)
 		cmd_flgs="$cmd_flgs $OPTARG"
@@ -222,7 +222,11 @@ while getopts ":d:rn:fom:MS:hV" opt "$@"; do
 		;;
 	(S)
 		skip_expr="$OPTARG"
-		parse_skip_expr
+		;;
+	(s)
+		test -n "`echo "$OPTARG" | sed -e 's/[0-9]*//'`" \
+			&& err '-s takes only numeric arguments'
+		skip_expr="-$OPTARG"
 		;;
 	(h)
 		usage
@@ -238,6 +242,8 @@ done
 shift $((OPTIND-1))
 
 test $# -gt 0 && err 'extraneous arguments'
+
+parse_skip_expr
 
 : ${dir:="$HOME/Downloads"}
 
