@@ -53,7 +53,7 @@ while getopts ":d:rn:fm:MohV" opt "$@"; do
 		if [[ x${OPTARG:0:1} == x"~" ]]; then
 			dir="$HOME${OPTARG:1}"
 		elif [[ x${OPTARG:0:1} =~ x"\." ]]; then
-			dir="`pwd`/$OPTARG"
+			dir="$PWD/$OPTARG"
 		else
 			dir="$OPTARG"
 		fi
