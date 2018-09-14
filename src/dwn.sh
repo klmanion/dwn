@@ -3,7 +3,7 @@
 #created by: Kurt L. Manion
 #on: 3 April 2016
 #last modified: 13 June 2018
-version="3.1.0"
+version="3.2.0"
 
 #patch note: in 2.6.4 fixed bug for -a flag
 #patch note: in 2.7.1 added -m flag
@@ -30,6 +30,10 @@ declare pat_flg=0
 declare pat_len
 declare neg_flg=0
 declare dash_flg=0
+
+declare -a excl_arr
+declare excl_len=0
+declare grep_flgs="--invert-match"
 
 declare name="`basename "${0:-dwn}"`"
 
@@ -169,7 +173,7 @@ skip_dex() {
 	return $neg_flg;
 }
 
-while getopts ":d:rn:fom:MS:s:hV" opt "$@"; do
+while getopts ":d:rn:fom:MS:s:e:EixhV" opt "$@"; do
 	case "$opt" in
 	(d)
 		if [[ ${OPTARG:0:1} == ~ ]]; then
@@ -228,6 +232,19 @@ while getopts ":d:rn:fom:MS:s:hV" opt "$@"; do
 			&& err '-s takes only numeric arguments'
 		skip_expr="-$OPTARG"
 		;;
+	(e)
+		excl_arr[$excl_len]="$OPTARG"
+		let "++excl_len"
+		;;
+	(E)
+		grep_flgs="$grep_flgs --extended-regexp"
+		;;
+	(i)
+		grep_flgs="$grep_flgs --ignore-case"
+		;;
+	(x)
+		grep_flgs="$grep_flgs --line-regexp"
+		;;
 	(h)
 		usage
 		;;
@@ -255,8 +272,14 @@ stat --version &>/dev/null \
 #filepath_lst="`eval "$stat_cmd" | sort -rn | head -$num_files \
 #	| cut -d $'\t' -f 2 | tr '\n' '\t'`" &>/dev/null
 
-filepath_lst="`eval "$stat_cmd" | sort -rn \
-	| cut -d $'\t' -f 2 | tr '\n' '\t'`" &>/dev/null
+filepath_lst="`eval "$stat_cmd" | sort -rn | cut -d $'\t' -f 2`" &>/dev/null
+
+for (( i=0; i<excl_len; ++i )); do
+	filepath_lst="`echo "$filepath_lst" \
+		| grep $grep_flgs -e "${excl_arr[$i]}"`"
+done
+
+filepath_lst="`echo "$filepath_lst" | tr '\n' '\t'`"
 
 IFS=$'\t'
 read -r -a filepath_arr <<< "$filepath_lst"
