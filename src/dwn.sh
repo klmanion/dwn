@@ -38,14 +38,12 @@ declare grep_flgs="--invert-match"
 declare name="`basename "${0:-dwn}"`"
 
 usage() {
-	printf '%s%s\n%s\n%s%s\n%s%s\n' 				\
+	printf '%s%s\n%s%s\n\t%s\n' 				\
 		'usage: '"$name"' -- return path of file most recently '\
 			'added to a folder' 				\
-		"$name"' [-r] [-d directory] [-n num_files]'  		\
-		"$name"' [-d directory] [-o application] [-f flags] '	\
-			'[-n num_files]'				\
-		"$name"' [-d directory] [-m destination | -M] '		\
-			'[-f flags] [-n num_files]'
+		"$name"' [-r | -o | -m destination | -M] '		\
+			'[-d directory] [-f flags] [-n num_files] '	\
+			'[-S skip_expr | -s skip_num] [-e exclude_regex]'
 	exit 64;
 }
 
