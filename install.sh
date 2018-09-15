@@ -17,9 +17,9 @@ if [ ! -d "/usr/local/share/man/man1/" ]; then
 	test $? -ne 0 && exit 1;
 fi
 
-chmod +x "./src/dwn.sh"
-cp "./src/dwn.sh" "/usr/local/bin/dwn"
-cp "./share/man/man1/dwn.1" "/usr/local/share/man/man1/"
+chmod +x "./src/dwn.sh" || exit 1;
+cp -f "./src/dwn.sh" "/usr/local/bin/dwn" || exit 1;
+cp -f "./share/man/man1/dwn.1" "/usr/local/share/man/man1/"
 exit $?;
 
 # vim: set ts=4 sw=4 noexpandtab:

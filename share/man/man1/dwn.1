@@ -5,123 +5,193 @@
 .Os UNIX
 .Sh NAME
 .Nm dwn
-.Nd open file most recently added to a folder
+.Nd manipulate file most recently added to a folder
 .Sh SYNOPSIS
 .Nm
-.Op Fl d Ar directory
-.Op Fl a Ar application
-.Op Fl n Ar num_files
+.Op Fl r | Fl o | Fl m Ar destination | Fl M
 .Nm
-.Op Fl r
+.Op Ar action
 .Op Fl d Ar directory
 .Op Fl n Ar num_files
+.Op Fl f Ar flags
 .Nm
-.Op Fl d Ar directory
-.Op Fl n Ar num_files
-.Op Fl l Ar ...literal_commands
+.Op Ar action
+.Op Fl S Ar skip_expr | Fl s Ar skip_num
 .Nm
-.Op Fl d Ar directory
-.Op Fl m Ar destination | Fl M
-.Op Fl f | Fl i
-.Op Fl n Ar num_files
+.Op Ar action
+.Op Fl Evix
+.Op Fl e Ar regex
 .Sh DESCRIPTION
 Using
 .Nm
-without any flags opens the file most recently added to the
+without any arguments prints to stdout the path of the file most recently added
+to the specified directory, which, by default, is the
 .Pa ~/Downloads
-directory with its default application as specified by the
-.Xr open 1
-command.  The directory, from which the file is chosen, can be changed to any other valid traversable directory with the \fB\-d\fR option.  The application, with which the file is opened, can be changed to any valid executable application with the \fB\-a\fR option.  This summarizes the first mode,
-.Qq normal mode ,
-shown in the Synopsis.
-.Pp
-The second mode,
-.Qq return mode ,
-is initiated when the \fB\-r\fR flag has been applied to the basename
-.Nm .
-Instead of opening the file, return mode dwn writes to stdout the path of the file most recently added to
-.Pa ~/Downloads
-or the directory specified by the following \fB\-d\fR option.  The main purpose of this mode is to be used for piping this filepath to other applications.
-.Pp
-The third mode, "literal mode", is chosen with the \fB\-l\fR flag followed by a list of arguments.  These arguments are passed literally to the
-.Xr open 1
-command, followed by the filepath of the file most recently added to the
-.Pa ~/Downloads
-directory or any other directory specified with the \fB\-d\fR option.  This gives finer control over the circumstances of the opening procedure.
-.Pp
-The fourth mode, "move mode", execs the
-.Xr mv 1
-command, essentially forming a synonym to `mv "`dwn -r`" \fIdestination\fR'.
+directory.
+Inlining usage of
 .Nm
-does not overwrite any file by default;
-the \fB\-f\fR or \fB\-i\fR flag must be specified to force an overwrite.
-
+in other commands allows the user to manipulate the file with the full power of
+their unix distribution.
+A few convenience forms have been added for commonly used file manipulation
+commands,
+and these actions are listed in the first synopsis line.
+The following synopsis lines group options that control the way
+.Nm
+functions, and may be used with any of the actions enumerated in the first
+synopsis line.
+.Pp
+The second synopsis line contains the options that control how the filepath is
+obtained.
+A directory other than the default may be specified with \fB\-d\fR.
+The number of files to obtain may be specified with \fB\-n\fR.
+Additional flags to be passed to the underlying command of the action form
+before the filepath itself may be specified with \fB\-f\fR.
+.Pp
+The third synopsis line contains the options that allow one to skip over
+certain files.
+The \fB\-s\fR option, which is a convenience form for the more comprehensive
+\fB\-S\fR option, takes a number and skips that many files that would have been
+obtained.
+This is useful for when one wishes to obtain a filepath or sequence of
+filepaths that had been the most recent in a directory,
+but since then have been pushed back by a few newer files.
+The \fB\-S\fR option allows for more involved use cases.
+.Pp
+The fourth synopsis line contains the options that allow one to match 
+filepaths with regular expressions.
+Basic regular expressions are used unless the \fB\-E\fR flag is passed to
+.Nm .
+See
+.Xr re_format 7
+for additional information on the difference between the types of regular
+expressions.
 .Sh OPTIONS
 .Bl -hang
-.It Sy Fl a ,
-Specify the application to open the file with.  This can be used the same as
-.Xr open 1 Ns ' Ns
-s \fB\-a\fR option.
-.It Sy Fl d ,
-This overrides the default directory
-.Pa ~/Downloads
-and will return the file most recently added to the supplied directory.
-.It Sy Fl r ,
-The return option tells dwn to print the filepath to stdout, instead of opening the file.  This is designed be used in conjunction with a pipe.  This is mutually exclusive to the \fB\-l\fR option.  If a alternative directory is to be specified one ought use the \fB-rd\fR construct
-.Pq see examples section .
-.It Sy Fl m ,
-The move option moves the file to the specified directory, instead of opening it.
-.It Sy Fl M ,
-An alias for `dwn -m .'.  Moves file to the current working directory.
-.It Sy Fl f ,
-Force 
-.Xr mv 1
-to overwrite any file if an overwrite would occur.
-(This only has effect if a move option is in use.)
-.It Sy Fl i ,
-Prompt the user for confirmation if a move would cause another file to be overwritten.
-(This only has effect if a move option is in use.)
-.It Sy Fl n ,
-Given a numeric argument, instead of operating on one file, operates on the specified number of files.  If there are less than that number of files in the directory
+.It Fl r ,
+The return option forces the default behavior of
+.Nm ,
+printing the obtained filepath or filepaths to stdout.
+This is designed be used in conjunction with piping or command substitution.
+It is recommended to use this flag when scripting with
 .Nm
-simply operates on the present files.
-.It Sy Fl l ,
-All commands following the \fB\-l\fR flag are passed literaly to the
+if one desires to use its default behavior,
+since the user may have aliased
+.Nm
+to use one of the other actions by default.
+.It Fl o ,
+The open option opens the obtained filepath or filepaths using
 .Xr open 1
-command, followed by the path of the file most recently added to the specified directory.  Note, since all commands coming after \fB\-l\fR are passed as-is to
-.Xr open 1 ,
-the \fB\-d\fR option _must_ come before the \fB\-l\fR option, lest it be parsed by
-.Xr open 1
-and result in the early termination of the program.
+on Darwin and
+.Xr xdg-open 1
+on GNU Linux.
+.It Fl m ,
+The move option moves the obtained filepath or filepaths to the specified
+directory.
+By default it does not overwrite files.
+.It Fl M ,
+An alias for
+.Sq dwn -m Ns \ . .
+Moves the obtained filepath or filepaths to the current working directory.
+By default it does not overwrite files.
+.It Fl d ,
+This overrides the default directory,
+.Pa ~/Downloads ,
+from which the selection is obtained.
+.It Fl n ,
+Given a numeric argument, instead of obtaining a filepath,
+.Nm
+obtains the specified number of files.
+If there are less than that number of files in the directory
+.Nm
+obtains what is available.
+.It Fl f ,
+The string of options and flags following \fB\-f\fR are passed to the command
+.Nm
+will use on the obtained filepath or filepaths.
+.It Fl S ,
+The skip option takes an expression,
+which is a comma separated list
+whose element is either an address or a range of addresses.
+These signify which files should be skipped when making the selection of
+filepaths.
+The address
+.Sq 1
+signifies the first file.
+Only the first range may omit its lower bound;
+this will skip the first n files, where n is the upper bound.
+If the upper bound is ommited, or is
+.Sq $ ,
+the range has the significance of being the rest of the addresses starting at
+the lower bound.
+The skip expression may be prefixed with a
+\(ga:',
+a
+.Sq ^ ,
+or both in any order.
+Prefixing the expression with a
+\(ga:'
+causes the list following it to be interpreted as a pattern
+that repeats once the highest bound is reached.
+This, then, has no effect if the highest bound is
+.Sq $ .
+Prefixing the expression with a
+.Sq ^
+negates the significance of the list following it,
+such that it does not specify which files are to be skipped
+but, rather, selected.
+.It Fl s ,
+Given a number, that number of files are skipped.
+This is the same as
+.Sq \-S "-n" ,
+where n is the number passed to \fB\-s\fR.
+.It Fl e ,
+Only select files whose name matches the specified regular expression.
+.It Fl E ,
+Cause the regular expression passed to \fB\-e\fR to be interpreted as an
+extended regular expression.
+This is the same as passing
+.Xr grep 1
+its \fB\-E\fR flag to force
+.Xr egrep 1
+like behavior.
+.It Fl v ,
+Invert the behavior of \fB\-e\fR, so that files which match the regular
+expression are excluded from the selection.
+.It Fl i ,
+Cause the regular expression passed to \fB\-e\fR to be matched
+case insensitively.
+.It Fl x ,
+Cause the regular expression passed to \fB\-e\fR to only match
+a file if it matches the whole name.
 .El
 .Sh EXAMPLES
-This opens the file most recently added to the desktop in textedit:
-.D1 dwn -d ~/Desktop -a /Applications/TextEdit.app
-.Pp
-or if you're currently in the home directory:
-.D1 dwn -d Desktop -a TextEdit
-.Pp
-TextEdit, there, was also abbreviated; another way to do this is:
-.D1 dwn -d ~/Desktop -l -e
-.Pp
-These two are the same:
-.D1 dwn -l -a /Applications/Safari.app
-.D1 open -a /Applications/Safari.app \fIfile\fR
-and this is also an alternative to simply using dwn's \fB\-a\fR option.  
+This prints out the filepath most recently added to the desktop:
+.Dl dwn -rd ~/Desktop
 .Pp
 This will print the file's contents to the command-line:
-.D1 dwn -d ~/Desktop -r | cat -
+.Dl dwn -rd ~/Desktop | cat -
 .Pp
-Take advantage of \fB-rd\fR to change the flow of the command's invokation, 
-.D1 dwn -rd ~/Desktop | cat -
+Open the most recently downloaded file:
+.Dl dwn -o
 .Pp
 Move the most recently downloaded file to the Documents folder:
-.D1 dwn -m ~/Documents
+.Dl dwn -m ~/Documents
 .Pp
-Move the 5 most recently downloaded files to the Documents folder.
-.D1 dwn -m ~/Documents -n 5
-.Sh BUGS
-FIXED:Currently this is no support for a -rd option which would allow the user to change the flow of the return mode from: "dwn -d dir -r"; to, "dwn -rd dir".
+Move the five most recently downloaded files to the Documents folder.
+.Dl dwn -m ~/Documents -n5
+.Pp
+Print out ten total filepaths, but skip a few that would otherwise have been
+printed:
+.Dl dwn -rn10 -S Ns Qq 2-5,8
+.Pp
+Print out the third and fifth filepath:
+.Dl dwn -rS Ns Qq ^3,5
+.Pp
+Print out every other file in the directory in order of their creation:
+.Dl dwn -rS Ns Qq :2
+.Pp
+Print out the five most recently created text files
+.Dl dwn -rn5 -e'\.txt'
 .Sh AUTHOR 
 dwn was created by
 .An Kurt L. Manion
@@ -129,4 +199,4 @@ on 3 April 2016.
 .Sh CONTACT
 .Aq klmanion@gmail.com .
 .Sh VERSION
-version 2.10.1 \(em 29 April 2018.
+version 3.3.0 \(em 15 September 2018.

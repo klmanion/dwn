@@ -1,3 +1,5 @@
 dwn_old.1
 foo
 htm.html
+*.swp
+.DS_Store
