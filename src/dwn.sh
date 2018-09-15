@@ -3,7 +3,7 @@
 #created by: Kurt L. Manion
 #on: 3 April 2016
 #last modified: 13 June 2018
-version="3.2.0"
+version="3.3.0"
 
 #patch note: in 2.6.4 fixed bug for -a flag
 #patch note: in 2.7.1 added -m flag
@@ -33,7 +33,7 @@ declare dash_flg=0
 
 declare -a excl_arr
 declare excl_len=0
-declare grep_flgs="--invert-match"
+declare grep_flgs=""
 
 declare name="`basename "${0:-dwn}"`"
 
@@ -43,7 +43,7 @@ usage() {
 			'added to a folder' 				\
 		"$name"' [-r | -o | -m destination | -M] '		\
 			'[-d directory] [-f flags] [-n num_files] '	\
-			'[-S skip_expr | -s skip_num] [-e exclude_regex]'
+			'[-S skip_expr | -s skip_num] [-Evix] [-e regex]'
 	exit 64;
 }
 
@@ -68,9 +68,11 @@ parse_skip_expr() {
 		case "${skip_expr:i:1}" in
 		(:)
 			pat_flg=1
+			test $num_files -eq 1 && num_files=0
 			;;
 		(^)
 			neg_flg=1
+			test $num_files -eq 1 && num_files=0
 			;;
 		(-)
 			dash_flg=1
@@ -171,7 +173,7 @@ skip_dex() {
 	return $neg_flg;
 }
 
-while getopts ":d:rn:fom:MS:s:e:EixhV" opt "$@"; do
+while getopts ":d:rn:fom:MS:s:e:EvixhV" opt "$@"; do
 	case "$opt" in
 	(d)
 		if [[ ${OPTARG:0:1} == ~ ]]; then
@@ -237,6 +239,9 @@ while getopts ":d:rn:fom:MS:s:e:EixhV" opt "$@"; do
 	(E)
 		grep_flgs="$grep_flgs --extended-regexp"
 		;;
+	(v)
+		grep_flgs="$grep_flgs --invert-match"
+		;;
 	(i)
 		grep_flgs="$grep_flgs --ignore-case"
 		;;
@@ -283,7 +288,7 @@ IFS=$'\t'
 read -r -a filepath_arr <<< "$filepath_lst"
 
 len=${#filepath_arr[@]}
-for (( dex=0,ct=0; dex<len && ct<num_files; ++dex )); do
+for (( dex=0,ct=0; dex<len && (num_files==0 || ct<num_files); ++dex )); do
 	filepath="${filepath_arr[$dex]}"
 
 	test -z "$filepath" && err 'stat command failed'
