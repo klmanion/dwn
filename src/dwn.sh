@@ -1,21 +1,11 @@
 #!/usr/bin/env bash
 #dwn
-#created by: Kurt L. Manion
-#on: 3 April 2016
-#last modified: 13 June 2018
-version="3.3.1"
+# created by: Kurt L. Manion
+# on: 3 April 2016
+# last modified: 10 Nov. 2018
+version="3.4.0"
 
-#patch note: in 2.6.4 fixed bug for -a flag
-#patch note: in 2.7.1 added -m flag
-#patch note: in 2.8.1 flag command flow was updated to modern bash syntax
-#	and project was added to github
-#patch note: in 2.9.0 added the -n option
-#patch note: in 3.0 -r becomes the default behavior, and -o is introduced
-#patch note: 3.1: adds support for skipping over results for the selection
-
-#on kali linux the stat version's first line is
-#stat (GNU coreutils) 8.25
-
+# Variable declarations {{{
 declare cmd="echo"
 declare cmd_flgs=""
 declare cmd_post=""
@@ -38,7 +28,9 @@ declare excl_len=0
 declare grep_flgs=""
 
 declare name="`basename "${0:-dwn}"`"
+# }}}
 
+# Function declarations {{{
 usage() {
 	printf '%s%s\n%s%s\n\t%s\n' 				\
 		'usage: '"$name"' -- return path of file most recently '\
@@ -61,6 +53,7 @@ err() {
 	exit 65;
 }
 
+# Skip expression {{{
 parse_skip_expr() {
 	local saved suf hi lo
 
@@ -174,7 +167,12 @@ skip_dex() {
 
 	return $neg_flg;
 }
+# }}}
+# }}}
 
+# Main script {{{
+
+# Option parsing {{{
 while getopts ":d:rR:n:fom:MS:s:e:EvixhV" opt "$@"; do
 	case "$opt" in
 	(d)
@@ -279,14 +277,12 @@ cmd_flgs="${cmd_flgs## }"
 parse_skip_expr
 
 : ${dir:="$HOME/Downloads"}
+# }}}
 
-#the first is Darwin, and the second is GNU stat
+#the first is Darwin, the second is GNU stat
 stat --version &>/dev/null \
 	&& stat_cmd='stat --printf "%B\t%n\n" "${dir}"/*' \
 	|| stat_cmd='stat -f "%B%t%N" "${dir}"/*'
-
-#filepath_lst="`eval "$stat_cmd" | sort -rn | head -$num_files \
-#	| cut -d $'\t' -f 2 | tr '\n' '\t'`" &>/dev/null
 
 filepath_lst="`eval "$stat_cmd" | sort -rn | cut -d $'\t' -f 2`" &>/dev/null
 
@@ -316,5 +312,6 @@ for (( dex=0,ct=0; dex<len && (num_files==0 || ct<num_files); ++dex )); do
 done
 
 exit 0;
+# }}}
 
 # vim: set ts=8 sw=8 noexpandtab tw=79:
