@@ -306,7 +306,12 @@ for (( dex=0,ct=0; dex<len && (num_files==0 || ct<num_files); ++dex )); do
 	if [ ! $? -eq 1 ]; then
 		let "++ct"
 	
-		$cmd $cmd_flgs "$filepath" "$cmd_post"
+		if [ -z "$cmd_post" ]; then
+			$cmd $cmd_flgs "$filepath"
+		else
+			$cmd $cmd_flgs "$filepath" "$cmd_post"
+		fi
+
 		test x"$print_delim" != x"\n" && echo -n "$print_delim"
 	fi
 done
