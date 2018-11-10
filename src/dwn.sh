@@ -20,6 +20,8 @@ declare cmd="echo"
 declare cmd_flgs=""
 declare cmd_post=""
 
+declare print_delim="\n"
+
 declare num_files=1
 
 declare skip_expr=""
@@ -132,10 +134,10 @@ parse_skip_expr() {
 # returns arithmetic boolean
 skip_dex() {
 	local dex hi lo
-	
-	let "dex = $1 + 1"
 
 	test -z "$skip_expr" && return 0;
+	
+	let "dex = $1 + 1"
 
 	test $pat_flg -eq 1 && let "dex %= pat_len"
 
@@ -173,7 +175,7 @@ skip_dex() {
 	return $neg_flg;
 }
 
-while getopts ":d:rn:fom:MS:s:e:EvixhV" opt "$@"; do
+while getopts ":d:rr:n:fom:MS:s:e:EvixhV" opt "$@"; do
 	case "$opt" in
 	(d)
 		if [[ ${OPTARG:0:1} == ~ ]]; then
@@ -190,6 +192,12 @@ while getopts ":d:rn:fom:MS:s:e:EvixhV" opt "$@"; do
 		cmd="echo"
 		cmd_flgs=""
 		cmd_post=""
+
+		if [ -z "$OPTARG" ]; then
+			print_delim=" "
+		else
+			print_delim="$OPTARG"
+		fi
 		;;
 	(n)
 		num_files="$OPTARG"
