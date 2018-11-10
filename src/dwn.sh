@@ -175,7 +175,7 @@ skip_dex() {
 	return $neg_flg;
 }
 
-while getopts ":d:rr:n:fom:MS:s:e:EvixhV" opt "$@"; do
+while getopts ":d:rR:n:fom:MS:s:e:EvixhV" opt "$@"; do
 	case "$opt" in
 	(d)
 		if [[ ${OPTARG:0:1} == ~ ]]; then
@@ -193,11 +193,14 @@ while getopts ":d:rr:n:fom:MS:s:e:EvixhV" opt "$@"; do
 		cmd_flgs=""
 		cmd_post=""
 
-		if [ -z "$OPTARG" ]; then
-			print_delim=" "
-		else
-			print_delim="$OPTARG"
-		fi
+		print_delim=" "
+		;;
+	(R)
+		cmd="echo"
+		cmd_flgs=""
+		cmd_post=""
+
+		print_delim="$OPTARG"
 		;;
 	(n)
 		num_files="$OPTARG"
