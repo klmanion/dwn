@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #install.sh
-#install dwn and its manpage
+# install dwn and its manpage
 
 if [ $(id -u) -ne 0 ]; then
 	printf 'this script must be run as root\n' >&2
@@ -22,4 +22,4 @@ cp -f "./src/dwn.sh" "/usr/local/bin/dwn" || exit 1;
 cp -f "./share/man/man1/dwn.1" "/usr/local/share/man/man1/"
 exit $?;
 
-# vim: set ts=4 sw=4 noexpandtab:
+# vim: set ts=8 sw=8 noexpandtab tw=79:
