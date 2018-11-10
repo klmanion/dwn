@@ -309,13 +309,13 @@ for (( dex=0,ct=0; dex<len && (num_files==0 || ct<num_files); ++dex )); do
 	
 		if [ -n "$cmd_flgs" ]; then
 			if [ -n "$cmd_post" ]; then
-				(exec $cmd "$cmd_flgs" "$filepath" "$cmd_post")
+				(exec $cmd $cmd_flgs "$filepath" $cmd_post)
 			else
-				(exec $cmd "$cmd_flgs" "$filepath")
+				(exec $cmd $cmd_flgs "$filepath")
 			fi
 		else
 			if [ -n "$cmd_post" ]; then
-				(exec $cmd "$filepath" "$cmd_post")
+				(exec $cmd "$filepath" $cmd_post)
 			else
 				(exec $cmd "$filepath")
 			fi
