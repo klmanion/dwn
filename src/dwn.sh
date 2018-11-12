@@ -10,7 +10,7 @@ declare cmd="echo"
 declare cmd_flgs=""
 declare cmd_post=""
 
-declare print_delim="\n"
+declare print_delim=""
 
 declare num_files=1
 
@@ -312,7 +312,7 @@ for (( dex=0,ct=0; dex<len && (num_files==0 || ct<num_files); ++dex )); do
 			$cmd $cmd_flgs "$filepath" "$cmd_post"
 		fi
 
-		test x"$print_delim" != x"\n" && echo -n "$print_delim"
+		test -n "$print_delim" && echo -n "$print_delim"
 	fi
 done
 
