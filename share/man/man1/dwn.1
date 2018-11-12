@@ -5,7 +5,7 @@
 .Os UNIX
 .Sh NAME
 .Nm dwn
-.Nd manipulate file most recently added to a folder
+.Nd manipulate file most recently added to a directory
 .Sh SYNOPSIS
 .Nm
 .Op Fl r | Fl o | Fl m Ar destination | Fl M
@@ -24,8 +24,8 @@
 .Sh DESCRIPTION
 Using
 .Nm
-without any arguments prints to stdout the path of the file most recently added
-to the specified directory, which, by default, is the
+without any arguments outputs the path of the file most recently added
+to a directory, which, by default, is the
 .Pa ~/Downloads
 directory.
 Inlining usage of
@@ -33,12 +33,32 @@ Inlining usage of
 in other commands allows the user to manipulate the file with the full power of
 their unix distribution.
 A few convenience forms have been added for commonly used file manipulation
-commands,
-and these actions are listed in the first synopsis line.
+commands;
+these actions are listed in the first synopsis line.
 The following synopsis lines group options that control the way
 .Nm
 functions, and may be used with any of the actions enumerated in the first
 synopsis line.
+.Pp
+The actions in the first synopsis line either affect the default printing
+behavior, or apply the filepath to a command.
+Of the former, thoes that affect printing,
+are \fB\-r\fR and \fB\-R\fR.
+Default printing behavior is to output the obtained filepaths delimited by a
+newline character.
+When inlining multiple filepaths from
+.Nm
+into another command's invocation,
+\fB\-r\fR must be used to delimit these filepaths with spaces.
+Any character whatsoever may be specified as the delimiter with \fB\-R\fR.
+Of the latter,
+thoes that apply the filepath to a command,
+there are \fB\-o\fR,
+which opens the file, and
+\fB\-m\fR,
+which moves the file to the specified directory,
+for which there is also the convenience form \fB\-M\fRthat moves the file to
+the current directory.
 .Pp
 The second synopsis line contains the options that control how the filepath is
 obtained.
@@ -68,16 +88,16 @@ expressions.
 .Sh OPTIONS
 .Bl -hang
 .It Fl r ,
-The return option forces the default behavior of
-.Nm ,
-printing the obtained filepath or filepaths to stdout.
+The return option forces
+.Nm
+to output the obtained filepath or filepaths with a space as delimitation,
+rather than a newline.
 This is designed be used in conjunction with piping or command substitution.
-It is recommended to use this flag when scripting with
-.Nm
-if one desires to use its default behavior,
-since the user may have aliased
-.Nm
-to use one of the other actions by default.
+This flag is necessary when using command substitution with a number of
+filepaths. 
+.It Fl R ,
+The following character
+is used for delimitation between filepaths.
 .It Fl o ,
 The open option opens the obtained filepath or filepaths using
 .Xr open 1
@@ -165,14 +185,20 @@ Cause the regular expression passed to \fB\-e\fR to only match
 a file if it matches the whole name.
 .El
 .Sh EXAMPLES
-This prints out the filepath most recently added to the desktop:
-.Dl dwn -rd ~/Desktop
+Print out the filepath most recently added to the desktop:
+.Dl dwn -d ~/Desktop
 .Pp
-This will print the file's contents to the command-line:
-.Dl dwn -rd ~/Desktop | cat -
+Print the file's contents to the command-line:
+.Dl dwn -d ~/Desktop | cat -
 .Pp
 Open the most recently downloaded file:
 .Dl dwn -o
+.Pp
+Open the most recently downloaded file without the convenience form:
+.Dl open `dwn`
+.Pp
+Open the five most recently downloaded files without the convenience form:
+.Dl eval open `dwn -rn5`
 .Pp
 Move the most recently downloaded file to the Documents folder:
 .Dl dwn -m ~/Documents
@@ -182,16 +208,16 @@ Move the five most recently downloaded files to the Documents folder.
 .Pp
 Print out ten total filepaths, but skip a few that would otherwise have been
 printed:
-.Dl dwn -rn10 -S Ns Qq 2-5,8
+.Dl dwn -n10 -S Ns Qq 2-5,8
 .Pp
 Print out the third and fifth filepath:
-.Dl dwn -rS Ns Qq ^3,5
+.Dl dwn -S Ns Qq ^3,5
 .Pp
 Print out every other file in the directory in order of their creation:
-.Dl dwn -rS Ns Qq :2
+.Dl dwn -S Ns Qq :2
 .Pp
 Print out the five most recently created text files
-.Dl dwn -rn5 -e'\.txt'
+.Dl dwn -n5 -e'\.txt'
 .Sh AUTHOR 
 dwn was created by
 .An Kurt L. Manion
@@ -199,4 +225,4 @@ on 3 April 2016.
 .Sh CONTACT
 .Aq klmanion@gmail.com .
 .Sh VERSION
-version 3.3.0 \(em 15 September 2018.
+version 3.4.0 \(em 12 November 2018.
