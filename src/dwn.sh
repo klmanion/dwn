@@ -11,6 +11,7 @@ declare cmd_flgs=""
 declare cmd_post=""
 
 declare print_delim=""
+declare fp_surr=""
 
 declare num_files=1
 
@@ -192,6 +193,7 @@ while getopts ":d:rR:n:fom:MS:s:e:EvixhV" opt "$@"; do
 		cmd_post=""
 
 		test -z "$print_delim" && print_delim=" "
+		fp_surr="\\'"
 		;;
 	(R)
 		cmd="echo"
@@ -306,18 +308,10 @@ for (( dex=0,ct=0; dex<len && (num_files==0 || ct<num_files); ++dex )); do
 	if [ ! $? -eq 1 ]; then
 		let "++ct"
 	
-		if [[ $cmd == echo && $num_files != 1 ]]; then
-			if [ -z "$cmd_post" ]; then
-				$cmd $cmd_flgs \'"$filepath"\'
-			else
-				$cmd $cmd_flgs \'"$filepath"\' "$cmd_post"
-			fi
+		if [ -z "$cmd_post" ]; then
+			eval $cmd $cmd_flgs $fp_surr"$filepath"$fp_surr
 		else
-			if [ -z "$cmd_post" ]; then
-				$cmd $cmd_flgs "$filepath"
-			else
-				$cmd $cmd_flgs "$filepath" "$cmd_post"
-			fi
+			eval $cmd $cmd_flgs $fp_surr"$filepath"$fp_surr "$cmd_post"
 		fi
 
 		test -n "$print_delim" && echo -n "$print_delim"
