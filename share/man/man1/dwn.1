@@ -8,7 +8,10 @@
 .Nd manipulate file most recently added to a directory
 .Sh SYNOPSIS
 .Nm
-.Op Fl r | Fl o | Fl m Ar destination | Fl M
+.Op Fl o | Fl m Ar destination | Fl M
+.Nm
+.Op Fl r
+.Op Fl R Ar delimiter
 .Nm
 .Op Ar action
 .Op Fl d Ar directory
@@ -40,34 +43,35 @@ The following synopsis lines group options that control the way
 functions, and may be used with any of the actions enumerated in the first
 synopsis line.
 .Pp
-The actions in the first synopsis line either affect the default printing
-behavior, or apply the filepath to a command.
-Of the former, thoes that affect printing,
-are \fB\-r\fR and \fB\-R\fR.
-Default printing behavior is to output the obtained filepaths delimited by a
+Open the obtained filepaths with \fB\-o\fR.
+Move the obtained filepaths to a specified directory with \fB\-m\fR.
+The convenience form \fB\-M\fR moves the obtained filepaths to
+the current directory.
+.Pp
+The second synopsis line contains the options that control the printing behavior.
+The default printing behavior is to output the obtained filepaths delimited by a
 newline character.
 When inlining multiple filepaths from
 .Nm
-into another command's invocation,
-\fB\-r\fR must be used to delimit these filepaths with spaces.
-Any character whatsoever may be specified as the delimiter with \fB\-R\fR.
-Of the latter,
-thoes that apply the filepath to a command,
-there are \fB\-o\fR,
-which opens the file, and
-\fB\-m\fR,
-which moves the file to the specified directory,
-for which there is also the convenience form \fB\-M\fRthat moves the file to
-the current directory.
+into another command's invocation
+\fB\-r\fR must be used to delimit these filepaths with spaces
+and enclose the filepaths in strong quotes.
+This is necessary for the command substitution to work on files which contain
+characters that have meaning for the shell and, thus, need to be quoted.
+This is not always necessary when piping
+.Nm Ns 's
+output to another program.
+Any character whatsoever may be specified as the delimiter used for output with
+\fB\-R\fR.
 .Pp
-The second synopsis line contains the options that control how the filepath is
+The third synopsis line contains the options that control how the filepath is
 obtained.
 A directory other than the default may be specified with \fB\-d\fR.
 The number of files to obtain may be specified with \fB\-n\fR.
 Additional flags to be passed to the underlying command of the action form
 before the filepath itself may be specified with \fB\-f\fR.
 .Pp
-The third synopsis line contains the options that allow one to skip over
+The fourth synopsis line contains the options that allow one to skip over
 certain files.
 The \fB\-s\fR option, which is a convenience form for the more comprehensive
 \fB\-S\fR option, takes a number and skips that many files that would have been
@@ -77,7 +81,7 @@ filepaths that had been the most recent in a directory,
 but since then have been pushed back by a few newer files.
 The \fB\-S\fR option allows for more involved use cases.
 .Pp
-The fourth synopsis line contains the options that allow one to match 
+The fifth synopsis line contains the options that allow one to match 
 filepaths with regular expressions.
 Basic regular expressions are used unless the \fB\-E\fR flag is passed to
 .Nm .
@@ -91,10 +95,9 @@ expressions.
 The return option forces
 .Nm
 to output the obtained filepath or filepaths with a space as delimitation,
-rather than a newline.
-This is designed be used in conjunction with piping or command substitution.
+rather than a newline, and enclose the filepaths with strong quotes.
 This flag is necessary when using command substitution with a number of
-filepaths. 
+filepaths.
 .It Fl R ,
 The following character
 is used for delimitation between filepaths.
