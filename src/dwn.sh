@@ -3,7 +3,7 @@
 # created by: Kurt L. Manion
 # on: 3 April 2016
 # last modified: 10 Nov. 2018
-version="3.4.1"
+version="3.4.2"
 
 # Variable declarations {{{1
 declare cmd="echo"
@@ -173,7 +173,7 @@ skip_dex() {
 while getopts ":d:rR:n:fom:MS:s:e:EvixhV" opt "$@"; do
 	case "$opt" in
 	(d)
-		if [[ ${OPTARG:0:1} == ~ ]]; then
+		if [[ ${OPTARG:0:1} == \~ ]]; then
 			dir="$HOME${OPTARG:1}"
 		elif [[ ${OPTARG:0:1} =~ \. ]]; then
 			dir="$PWD/$OPTARG"
