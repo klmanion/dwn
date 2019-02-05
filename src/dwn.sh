@@ -3,7 +3,7 @@
 # created by: Kurt L. Manion
 # on: 3 April 2016
 # last modified: 10 Nov. 2018
-version="3.4.0"
+version="3.4.1"
 
 # Variable declarations {{{
 declare cmd="echo"
@@ -11,7 +11,6 @@ declare cmd_flgs=""
 declare cmd_post=""
 
 declare print_delim=""
-declare fp_surr=""
 
 declare num_files=1
 
@@ -193,7 +192,6 @@ while getopts ":d:rR:n:fom:MS:s:e:EvixhV" opt "$@"; do
 		cmd_post=""
 
 		test -z "$print_delim" && print_delim=" "
-		fp_surr="\\'"
 		;;
 	(R)
 		cmd="echo"
@@ -307,12 +305,8 @@ for (( dex=0,ct=0; dex<len && (num_files==0 || ct<num_files); ++dex )); do
 	skip_dex $dex
 	if [ ! $? -eq 1 ]; then
 		let "++ct"
-	
-		if [ -z "$cmd_post" ]; then
-			eval $cmd $cmd_flgs $fp_surr"$filepath"$fp_surr
-		else
-			eval $cmd $cmd_flgs $fp_surr"$filepath"$fp_surr "$cmd_post"
-		fi
+
+		eval $cmd $cmd_flgs \'"$filepath"\' "$cmd_post"
 
 		test -n "$print_delim" && echo -n "$print_delim"
 	fi
