@@ -167,14 +167,20 @@ This is the same as
 .Sq \-S "-n" ,
 where n is the number passed to \fB\-s\fR.
 .It Fl e ,
-Only select files whose name matches the specified regular expression.
+Only files matching the regular expression following this flag will be selected.
+Multiple \fB\-e\fR flags may be passed;
+this broadens the search.
+.It Fl x ,
+Files matching the regular expression following this flag are ommited from the
+selection.
 .It Fl g ,
 The flags following \fB\-g\fR are passed to
 .Xr grep 1 .
 For convenience the initial dash may be omitted.
+The flag \fB\-gv\fR may not be specified;
+use \fB\-x\fR ass opposed to \fB\-e\fR for this functionality.
 A selection of uses are:
 \fB\-gE\fR (use extended regular expressions);
-\fB\-gv\fR (invert matching behavior);
 \fB\-gi\fR (ignore case); and
 \fB\-gx\fR (match the regular expression to the whole line).
 See the
