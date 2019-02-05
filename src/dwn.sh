@@ -5,7 +5,7 @@
 # last modified: 10 Nov. 2018
 version="3.4.1"
 
-# Variable declarations {{{
+# Variable declarations {{{1
 declare cmd="echo"
 declare cmd_flgs=""
 declare cmd_post=""
@@ -28,9 +28,8 @@ declare excl_len=0
 declare grep_flgs=""
 
 declare name="`basename "${0:-dwn}"`"
-# }}}
 
-# Function declarations {{{
+# Function declarations {{{1
 usage() {
 	printf '%s%s\n%s%s\n\t%s\n' 				\
 		'usage: '"$name"' -- return path of file most recently '\
@@ -53,7 +52,7 @@ err() {
 	exit 65;
 }
 
-# Skip expression {{{
+# Skip expression {{{2
 parse_skip_expr() {
 	local saved suf hi lo
 
@@ -167,12 +166,10 @@ skip_dex() {
 
 	return $neg_flg;
 }
-# }}}
-# }}}
 
-# Main script {{{
+# Main script {{{1
 
-# Option parsing {{{
+# Option parsing {{{2
 while getopts ":d:rR:n:fom:MS:s:e:EvixhV" opt "$@"; do
 	case "$opt" in
 	(d)
@@ -277,7 +274,7 @@ cmd_flgs="${cmd_flgs## }"
 parse_skip_expr
 
 : ${dir:="$HOME/Downloads"}
-# }}}
+# }}}2
 
 #the first is Darwin, the second is GNU stat
 stat --version &>/dev/null \
@@ -313,6 +310,6 @@ for (( dex=0,ct=0; dex<len && (num_files==0 || ct<num_files); ++dex )); do
 done
 
 exit 0;
-# }}}
+# }}}1
 
-# vim: set ts=8 sw=8 noexpandtab tw=79:
+# vi: set ts=8 sw=8 noexpandtab tw=79:
