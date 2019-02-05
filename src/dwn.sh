@@ -170,7 +170,7 @@ skip_dex() {
 # Main script {{{1
 
 # Option parsing {{{2
-while getopts ":d:rR:n:fom:MS:s:e:EvixhV" opt "$@"; do
+while getopts ":d:rR:n:fom:MS:s:e:g:hV" opt "$@"; do
 	case "$opt" in
 	(d)
 		if [[ ${OPTARG:0:1} == \~ ]]; then
@@ -242,17 +242,12 @@ while getopts ":d:rR:n:fom:MS:s:e:EvixhV" opt "$@"; do
 		excl_arr[$excl_len]="$OPTARG"
 		let "++excl_len"
 		;;
-	(E)
-		grep_flgs="$grep_flgs --extended-regexp"
-		;;
-	(v)
-		grep_flgs="$grep_flgs --invert-match"
-		;;
-	(i)
-		grep_flgs="$grep_flgs --ignore-case"
-		;;
-	(x)
-		grep_flgs="$grep_flgs --line-regexp"
+	(g)
+		if [[ ${OPTARG:0:1} == - ]]; then
+			grep_flgs="$grep_flgs $OPTARG"
+		else
+			grep_flgs="$grep_flgs -$OPTARG"
+		fi
 		;;
 	(h)
 		usage
