@@ -23,8 +23,12 @@ declare pat_len
 declare neg_flg=0
 declare dash_flg=0
 
+declare -a regex_arr
+declare regex_arr_len=0
+
 declare -a excl_arr
-declare excl_len=0
+declare excl_arr_len=0
+
 declare grep_flgs=""
 
 declare name="`basename "${0:-dwn}"`"
@@ -170,7 +174,7 @@ skip_dex() {
 # Main script {{{1
 
 # Option parsing {{{2
-while getopts ":d:rR:n:fom:MS:s:e:g:hV" opt "$@"; do
+while getopts ":d:rR:n:fom:MS:s:e:x:g:hV" opt "$@"; do
 	case "$opt" in
 	(d)
 		if [[ ${OPTARG:0:1} == \~ ]]; then
@@ -201,8 +205,8 @@ while getopts ":d:rR:n:fom:MS:s:e:g:hV" opt "$@"; do
 		num_files="$OPTARG"
 		test -n "`echo "$num_files" | sed -e 's/[0-9]*//'`" \
 			&& err '-n takes only numeric arguments'
-		test "$num_files" -lt 1 \
-			&& err 'number of files must be set to at least 1' 
+		test "$num_files" -lt 0 \
+			&& err 'number of files must be set to at least 0' 
 		;;
 	(f)
 		cmd_flgs="$cmd_flgs $OPTARG"
@@ -239,8 +243,12 @@ while getopts ":d:rR:n:fom:MS:s:e:g:hV" opt "$@"; do
 		skip_expr="-$OPTARG"
 		;;
 	(e)
-		excl_arr[$excl_len]="$OPTARG"
-		let "++excl_len"
+		regex_arr[$regex_arr_len]="$OPTARG"
+		let "++regex_arr_len"
+		;;
+	(x)
+		excl_arr[$excl_arr_len]="$OPTARG"
+		let "++excl_arr_len"
 		;;
 	(g)
 		if [[ ${OPTARG:0:1} == - ]]; then
@@ -271,17 +279,34 @@ parse_skip_expr
 : ${dir:="$HOME/Downloads"}
 # }}}2
 
-#the first is Darwin, the second is GNU stat
+# the first is Darwin, the second is GNU stat
 stat --version &>/dev/null \
 	&& stat_cmd='stat --printf "%B\t%n\n" "${dir}"/*' \
 	|| stat_cmd='stat -f "%B%t%N" "${dir}"/*'
 
-filepath_lst="`eval "$stat_cmd" | sort -rn | cut -d $'\t' -f 2`" &>/dev/null
+stat_fp_lst="`eval "$stat_cmd" | sort -rn | cut -d $'\t' -f 2`" &>/dev/null
 
-for (( i=0; i<excl_len; ++i )); do
-	filepath_lst="`echo "$filepath_lst" \
-		| grep $grep_flgs -e "${excl_arr[$i]}"`"
+filtered_fp_lst="$stat_fp_lst"
+for (( i=0; i<excl_arr_len; ++i )); do
+	filtered_fp_lst="`echo "$filtered_fp_lst" \
+		| eval grep $grep_flags --invert-match -e\'"${excl_arr[$i]}"\'`"
 done
+
+if [ $regex_arr_len -eq 0 ]; then
+	filepath_lst="$filtered_fp_lst"
+else
+	filepath_lst=""
+	for (( i=0; i<regex_arr_len; ++i )); do
+		append="`echo "$filtered_fp_lst" \
+			| eval grep $grep_flgs -e"${regex_arr[$i]}"`"
+
+		if [ -z $filepath_lst ]; then
+			filepath_lst="$append"
+		else
+			filepath_lst="$filepath_lst"$'\n'"$append"
+		fi
+	done
+fi
 
 filepath_lst="`echo "$filepath_lst" | tr '\n' '\t'`"
 
