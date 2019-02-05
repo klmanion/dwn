@@ -22,7 +22,7 @@
 .Op Fl S Ar skip_expr | Fl s Ar skip_num
 .Nm
 .Op Ar action
-.Op Fl Evix
+.Op Fl g Ar grep_flags
 .Op Fl e Ar regex
 .Sh DESCRIPTION
 Using
@@ -83,8 +83,7 @@ The \fB\-S\fR option allows for more involved use cases.
 .Pp
 The fifth synopsis line contains the options that allow one to match 
 filepaths with regular expressions.
-Basic regular expressions are used unless the \fB\-E\fR flag is passed to
-.Nm .
+Basic regular expressions are used unless the \fB\-gE\fR flag is passed.
 See
 .Xr re_format 7
 for additional information on the difference between the types of regular
@@ -169,30 +168,25 @@ This is the same as
 where n is the number passed to \fB\-s\fR.
 .It Fl e ,
 Only select files whose name matches the specified regular expression.
-.It Fl E ,
-Cause the regular expression passed to \fB\-e\fR to be interpreted as an
-extended regular expression.
-This is the same as passing
+.It Fl g ,
+The flags following \fB\-g\fR are passed to
+.Xr grep 1 .
+For convenience the initial dash may be omitted.
+A selection of uses are:
+\fB\-gE\fR (use extended regular expressions);
+\fB\-gv\fR (invert matching behavior);
+\fB\-gi\fR (ignore case); and
+\fB\-gx\fR (match the regular expression to the whole line).
+See the
 .Xr grep 1
-its \fB\-E\fR flag to force
-.Xr egrep 1
-like behavior.
-.It Fl v ,
-Invert the behavior of \fB\-e\fR, so that files which match the regular
-expression are excluded from the selection.
-.It Fl i ,
-Cause the regular expression passed to \fB\-e\fR to be matched
-case insensitively.
-.It Fl x ,
-Cause the regular expression passed to \fB\-e\fR to only match
-a file if it matches the whole name.
+manpage for a full listing of options which may be passed to grep.
 .El
 .Sh EXAMPLES
 Print out the filepath most recently added to the desktop:
-.Dl dwn -d ~/Desktop
+.Dl dwn -d~/Desktop
 .Pp
 Print the file's contents to the command-line:
-.Dl dwn -d ~/Desktop | cat -
+.Dl dwn -d~/Desktop | cat -
 .Pp
 Open the most recently downloaded file:
 .Dl dwn -o
@@ -204,10 +198,10 @@ Open the five most recently downloaded files without the convenience form:
 .Dl eval open `dwn -rn5`
 .Pp
 Move the most recently downloaded file to the Documents folder:
-.Dl dwn -m ~/Documents
+.Dl dwn -m~/Documents
 .Pp
 Move the five most recently downloaded files to the Documents folder.
-.Dl dwn -m ~/Documents -n5
+.Dl dwn -m~/Documents -n5
 .Pp
 Print out ten total filepaths, but skip a few that would otherwise have been
 printed:
@@ -228,4 +222,4 @@ on 3 April 2016.
 .Sh CONTACT
 .Aq klmanion@gmail.com .
 .Sh VERSION
-version 3.4.0 \(em 12 November 2018.
+version 3.5.0 \(em 5 February 2018.
