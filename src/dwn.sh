@@ -12,6 +12,7 @@ declare cmd_post=""
 
 declare print_delim=""
 
+declare dir=""
 declare num_files=1
 
 declare skip_expr=""
@@ -367,7 +368,7 @@ cmd_flgs="${cmd_flgs## }"
 
 parse_skip_expr
 
-: ${dir:="$HOME/Downloads"}
+: ${dir:="${DOWNLOAD_DIR:-"$HOME/Downloads"}"}
 # }}}2
 
 # the first is Darwin, the second is GNU stat
