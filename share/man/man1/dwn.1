@@ -89,48 +89,48 @@ See
 for additional information on the difference between the types of regular
 expressions.
 .Sh OPTIONS
-.Bl -hang
-.It Fl r ,
+.Bl -tag -width indent
+.It Fl r , Fl Fl return
 The return option forces
 .Nm
 to output the obtained filepath or filepaths with a space as delimitation,
 rather than a newline, and enclose the filepaths with strong quotes.
 This flag is necessary when using command substitution with a number of
 filepaths.
-.It Fl R ,
+.It Fl R Ar delim, Fl Fl print-delim Ns = Ns Ar delim
 The following character
 is used for delimitation between filepaths.
-.It Fl o ,
+.It Fl o , Fl Fl open
 The open option opens the obtained filepath or filepaths using
 .Xr open 1
 on Darwin and
 .Xr xdg-open 1
 on GNU Linux.
-.It Fl m ,
+.It Fl m Ar dest, Fl Fl move Ns = Ns Ar dest
 The move option moves the obtained filepath or filepaths to the specified
 directory.
 By default it does not overwrite files.
-.It Fl M ,
+.It Fl M , Fl Fl move-here
 An alias for
 .Sq dwn -m Ns \ . .
 Moves the obtained filepath or filepaths to the current working directory.
 By default it does not overwrite files.
-.It Fl d ,
+.It Fl d Ar dir , Fl Fl directory Ns = Ns Ar dir
 This overrides the default directory,
 .Pa ~/Downloads ,
 from which the selection is obtained.
-.It Fl n ,
+.It Fl n Ar num , Fl Fl repetitions Ns = Ns Ar num
 Given a numeric argument, instead of obtaining a filepath,
 .Nm
 obtains the specified number of files.
 If there are less than that number of files in the directory
 .Nm
 obtains what is available.
-.It Fl f ,
+.It Fl f Ar flags , Fl Fl flags Ns = Ns Ar flags
 The string of options and flags following \fB\-f\fR are passed to the command
 .Nm
 will use on the obtained filepath or filepaths.
-.It Fl S ,
+.It Fl S Ar expr , Fl Fl skip-expr Ns = Ns Ar expr
 The skip option takes an expression,
 which is a comma separated list
 whose element is either an address or a range of addresses.
@@ -161,19 +161,19 @@ Prefixing the expression with a
 negates the significance of the list following it,
 such that it does not specify which files are to be skipped
 but, rather, selected.
-.It Fl s ,
+.It Fl s Ar num , Fl Fl skip-num Ns = Ns Ar num
 Given a number, that number of files are skipped.
 This is the same as
 .Sq \-S "-n" ,
 where n is the number passed to \fB\-s\fR.
-.It Fl e ,
+.It Fl e Ar regex , Fl Fl regex Ns = Ns Ar regex
 Only files matching the regular expression following this flag will be selected.
 Multiple \fB\-e\fR flags may be passed;
 this broadens the search.
-.It Fl x ,
+.It Fl x Ar regex , Fl Fl exclude Ns = Ns Ar regex
 Files matching the regular expression following this flag are ommited from the
 selection.
-.It Fl g ,
+.It Fl g Ar flags , Fl Fl grep-flags Ns = Ns Ar flags
 The flags following \fB\-g\fR are passed to
 .Xr grep 1 .
 For convenience the initial dash may be omitted.
@@ -228,4 +228,4 @@ on 3 April 2016.
 .Sh CONTACT
 .Aq klmanion@gmail.com .
 .Sh VERSION
-version 3.5.1 \(em 5 February 2018.
+version 3.6.0 \(em 8 February 2019.
