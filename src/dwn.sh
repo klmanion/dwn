@@ -248,8 +248,11 @@ while getopts $optstr opt "$@"; do
 			opt="V"
 			;;
 
+		(*=*)
+			err '--'"${OPTARG%%=*}"' does not take an argument'
+			;;
 		(*)
-			err 'unknown argument --'"${OPTARG%%=*}"''
+			err 'unknown option --'"${OPTARG%%=*}"''
 			;;
 		esac
 
