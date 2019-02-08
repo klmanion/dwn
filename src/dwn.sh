@@ -323,7 +323,7 @@ for (( dex=0,ct=0; dex<len && (num_files==0 || ct<num_files); ++dex )); do
 	if [ ! $? -eq 1 ]; then
 		let "++ct"
 
-		eval $cmd $cmd_flgs \'"$filepath"\' "$cmd_post"
+		eval $cmd $cmd_flgs \'"$filepath"\' $cmd_post
 
 		test -n "$print_delim" && echo -n "$print_delim"
 	fi
