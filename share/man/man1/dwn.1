@@ -5,10 +5,13 @@
 .Os UNIX
 .Sh NAME
 .Nm dwn
-.Nd manipulate file most recently added to a folder
+.Nd manipulate file most recently added to a directory
 .Sh SYNOPSIS
 .Nm
-.Op Fl r | Fl o | Fl m Ar destination | Fl M
+.Op Fl o | Fl m Ar destination | Fl M
+.Nm
+.Op Fl r
+.Op Fl R Ar delimiter
 .Nm
 .Op Ar action
 .Op Fl d Ar directory
@@ -19,35 +22,57 @@
 .Op Fl S Ar skip_expr | Fl s Ar skip_num
 .Nm
 .Op Ar action
-.Op Fl Evix
+.Op Fl g Ar grep_flags
 .Op Fl e Ar regex
 .Sh DESCRIPTION
 Using
 .Nm
-without any arguments prints to stdout the path of the file most recently added
-to the specified directory, which, by default, is the
+without any arguments outputs the path of the file most recently added
+to a directory, which, by default, is 
 .Pa ~/Downloads
-directory.
+or the path specified by
+.Ev DOWNLOAD_DIR .
 Inlining usage of
 .Nm
 in other commands allows the user to manipulate the file with the full power of
 their unix distribution.
 A few convenience forms have been added for commonly used file manipulation
-commands,
-and these actions are listed in the first synopsis line.
+commands;
+these actions are listed in the first synopsis line.
 The following synopsis lines group options that control the way
 .Nm
 functions, and may be used with any of the actions enumerated in the first
 synopsis line.
 .Pp
-The second synopsis line contains the options that control how the filepath is
+Open the obtained filepaths with \fB\-o\fR.
+Move the obtained filepaths to a specified directory with \fB\-m\fR.
+The convenience form \fB\-M\fR moves the obtained filepaths to
+the current directory.
+.Pp
+The second synopsis line contains the options that control the printing behavior.
+The default printing behavior is to output the obtained filepaths delimited by a
+newline character.
+When inlining multiple filepaths from
+.Nm
+into another command's invocation
+\fB\-r\fR must be used to delimit these filepaths with spaces
+and enclose the filepaths in strong quotes.
+This is necessary for the command substitution to work on files which contain
+characters that have meaning for the shell and, thus, need to be quoted.
+This is not always necessary when piping
+.Nm Ns 's
+output to another program.
+Any character whatsoever may be specified as the delimiter used for output with
+\fB\-R\fR.
+.Pp
+The third synopsis line contains the options that control how the filepath is
 obtained.
 A directory other than the default may be specified with \fB\-d\fR.
 The number of files to obtain may be specified with \fB\-n\fR.
 Additional flags to be passed to the underlying command of the action form
 before the filepath itself may be specified with \fB\-f\fR.
 .Pp
-The third synopsis line contains the options that allow one to skip over
+The fourth synopsis line contains the options that allow one to skip over
 certain files.
 The \fB\-s\fR option, which is a convenience form for the more comprehensive
 \fB\-S\fR option, takes a number and skips that many files that would have been
@@ -57,58 +82,56 @@ filepaths that had been the most recent in a directory,
 but since then have been pushed back by a few newer files.
 The \fB\-S\fR option allows for more involved use cases.
 .Pp
-The fourth synopsis line contains the options that allow one to match 
+The fifth synopsis line contains the options that allow one to match 
 filepaths with regular expressions.
-Basic regular expressions are used unless the \fB\-E\fR flag is passed to
-.Nm .
+Basic regular expressions are used unless the \fB\-gE\fR flag is passed.
 See
 .Xr re_format 7
 for additional information on the difference between the types of regular
 expressions.
 .Sh OPTIONS
-.Bl -hang
-.It Fl r ,
-The return option forces the default behavior of
-.Nm ,
-printing the obtained filepath or filepaths to stdout.
-This is designed be used in conjunction with piping or command substitution.
-It is recommended to use this flag when scripting with
+.Bl -tag -width indent
+.It Fl r , Fl Fl return
+The return option forces
 .Nm
-if one desires to use its default behavior,
-since the user may have aliased
-.Nm
-to use one of the other actions by default.
-.It Fl o ,
+to output the obtained filepath or filepaths with a space as delimitation,
+rather than a newline, and enclose the filepaths with strong quotes.
+This flag is necessary when using command substitution with a number of
+filepaths.
+.It Fl R Ar delim, Fl Fl print-delim Ns = Ns Ar delim
+The following character
+is used for delimitation between filepaths.
+.It Fl o , Fl Fl open
 The open option opens the obtained filepath or filepaths using
 .Xr open 1
 on Darwin and
 .Xr xdg-open 1
 on GNU Linux.
-.It Fl m ,
+.It Fl m Ar dest, Fl Fl move Ns = Ns Ar dest
 The move option moves the obtained filepath or filepaths to the specified
 directory.
 By default it does not overwrite files.
-.It Fl M ,
+.It Fl M , Fl Fl move-here
 An alias for
 .Sq dwn -m Ns \ . .
 Moves the obtained filepath or filepaths to the current working directory.
 By default it does not overwrite files.
-.It Fl d ,
+.It Fl d Ar dir , Fl Fl directory Ns = Ns Ar dir
 This overrides the default directory,
 .Pa ~/Downloads ,
 from which the selection is obtained.
-.It Fl n ,
+.It Fl n Ar num , Fl Fl repetitions Ns = Ns Ar num
 Given a numeric argument, instead of obtaining a filepath,
 .Nm
 obtains the specified number of files.
 If there are less than that number of files in the directory
 .Nm
 obtains what is available.
-.It Fl f ,
+.It Fl f Ar flags , Fl Fl flags Ns = Ns Ar flags
 The string of options and flags following \fB\-f\fR are passed to the command
 .Nm
 will use on the obtained filepath or filepaths.
-.It Fl S ,
+.It Fl S Ar expr , Fl Fl skip-expr Ns = Ns Ar expr
 The skip option takes an expression,
 which is a comma separated list
 whose element is either an address or a range of addresses.
@@ -139,59 +162,74 @@ Prefixing the expression with a
 negates the significance of the list following it,
 such that it does not specify which files are to be skipped
 but, rather, selected.
-.It Fl s ,
+.It Fl s Ar num , Fl Fl skip-num Ns = Ns Ar num
 Given a number, that number of files are skipped.
 This is the same as
 .Sq \-S "-n" ,
 where n is the number passed to \fB\-s\fR.
-.It Fl e ,
-Only select files whose name matches the specified regular expression.
-.It Fl E ,
-Cause the regular expression passed to \fB\-e\fR to be interpreted as an
-extended regular expression.
-This is the same as passing
+.It Fl e Ar regex , Fl Fl regex Ns = Ns Ar regex
+Only files matching the regular expression following this flag will be selected.
+Multiple \fB\-e\fR flags may be passed;
+this broadens the search.
+.It Fl x Ar regex , Fl Fl exclude Ns = Ns Ar regex
+Files matching the regular expression following this flag are ommited from the
+selection.
+.It Fl g Ar flags , Fl Fl grep-flags Ns = Ns Ar flags
+The flags following \fB\-g\fR are passed to
+.Xr grep 1 .
+For convenience the initial dash may be omitted.
+The flag \fB\-gv\fR may not be specified;
+use \fB\-x\fR ass opposed to \fB\-e\fR for this functionality.
+A selection of uses are:
+\fB\-gE\fR (use extended regular expressions);
+\fB\-gi\fR (ignore case); and
+\fB\-gx\fR (match the regular expression to the whole line).
+See the
 .Xr grep 1
-its \fB\-E\fR flag to force
-.Xr egrep 1
-like behavior.
-.It Fl v ,
-Invert the behavior of \fB\-e\fR, so that files which match the regular
-expression are excluded from the selection.
-.It Fl i ,
-Cause the regular expression passed to \fB\-e\fR to be matched
-case insensitively.
-.It Fl x ,
-Cause the regular expression passed to \fB\-e\fR to only match
-a file if it matches the whole name.
+manpage for a full listing of options which may be passed to grep.
 .El
 .Sh EXAMPLES
-This prints out the filepath most recently added to the desktop:
-.Dl dwn -rd ~/Desktop
+Print out the filepath most recently added to the desktop:
+.Dl dwn -d~/Desktop
 .Pp
-This will print the file's contents to the command-line:
-.Dl dwn -rd ~/Desktop | cat -
+Print the file's contents to the command-line:
+.Dl dwn -d~/Desktop | cat -
 .Pp
 Open the most recently downloaded file:
 .Dl dwn -o
 .Pp
+Open the most recently downloaded file without the convenience form:
+.Dl open `dwn`
+.Pp
+Open the five most recently downloaded files without the convenience form:
+.Dl eval open `dwn -rn5`
+.Pp
 Move the most recently downloaded file to the Documents folder:
-.Dl dwn -m ~/Documents
+.Dl dwn -m~/Documents
 .Pp
 Move the five most recently downloaded files to the Documents folder.
-.Dl dwn -m ~/Documents -n5
+.Dl dwn -m~/Documents -n5
 .Pp
 Print out ten total filepaths, but skip a few that would otherwise have been
 printed:
-.Dl dwn -rn10 -S Ns Qq 2-5,8
+.Dl dwn -n10 -S Ns Qq 2-5,8
 .Pp
 Print out the third and fifth filepath:
-.Dl dwn -rS Ns Qq ^3,5
+.Dl dwn -S Ns Qq ^3,5
 .Pp
 Print out every other file in the directory in order of their creation:
-.Dl dwn -rS Ns Qq :2
+.Dl dwn -S Ns Qq :2
 .Pp
 Print out the five most recently created text files
-.Dl dwn -rn5 -e'\.txt'
+.Dl dwn -n5 -e'\.txt'
+.Sh ENVIRONMENT
+.Bl -tag
+.It Ev DOWNLOAD_DIR
+When set
+.Nm
+will use this directory by default rather than
+.Pa ~/Downloads .
+.El
 .Sh AUTHOR 
 dwn was created by
 .An Kurt L. Manion
@@ -199,4 +237,4 @@ on 3 April 2016.
 .Sh CONTACT
 .Aq klmanion@gmail.com .
 .Sh VERSION
-version 3.3.0 \(em 15 September 2018.
+version 3.7.0 \(em 8 February 2019.

@@ -1,25 +1,18 @@
 #!/usr/bin/env bash
 #dwn
-#created by: Kurt L. Manion
-#on: 3 April 2016
-#last modified: 13 June 2018
-version="3.3.1"
+# created by: Kurt L. Manion
+# on: 3 April 2016
+# last modified: 10 Nov. 2018
+version="3.7.0"
 
-#patch note: in 2.6.4 fixed bug for -a flag
-#patch note: in 2.7.1 added -m flag
-#patch note: in 2.8.1 flag command flow was updated to modern bash syntax
-#	and project was added to github
-#patch note: in 2.9.0 added the -n option
-#patch note: in 3.0 -r becomes the default behavior, and -o is introduced
-#patch note: 3.1: adds support for skipping over results for the selection
-
-#on kali linux the stat version's first line is
-#stat (GNU coreutils) 8.25
-
+# Variable declarations {{{1
 declare cmd="echo"
 declare cmd_flgs=""
 declare cmd_post=""
 
+declare print_delim=""
+
+declare dir=""
 declare num_files=1
 
 declare skip_expr=""
@@ -31,19 +24,24 @@ declare pat_len
 declare neg_flg=0
 declare dash_flg=0
 
+declare -a regex_arr
+declare regex_arr_len=0
+
 declare -a excl_arr
-declare excl_len=0
+declare excl_arr_len=0
+
 declare grep_flgs=""
 
 declare name="`basename "${0:-dwn}"`"
 
+# Function declarations {{{1
 usage() {
 	printf '%s%s\n%s%s\n\t%s\n' 				\
 		'usage: '"$name"' -- return path of file most recently '\
 			'added to a folder' 				\
 		"$name"' [-r | -o | -m destination | -M] '		\
 			'[-d directory] [-f flags] [-n num_files] '	\
-			'[-S skip_expr | -s skip_num] [-Evix] [-e regex]'
+			'[-S skip_expr | -s skip_num] [-g grep_flag] [-e regex]'
 	exit 64;
 }
 
@@ -59,6 +57,7 @@ err() {
 	exit 65;
 }
 
+# Skip expression {{{2
 parse_skip_expr() {
 	local saved suf hi lo
 
@@ -132,10 +131,10 @@ parse_skip_expr() {
 # returns arithmetic boolean
 skip_dex() {
 	local dex hi lo
-	
-	let "dex = $1 + 1"
 
 	test -z "$skip_expr" && return 0;
+	
+	let "dex = $1 + 1"
 
 	test $pat_flg -eq 1 && let "dex %= pat_len"
 
@@ -173,10 +172,104 @@ skip_dex() {
 	return $neg_flg;
 }
 
-while getopts ":d:rn:fom:MS:s:e:EvixhV" opt "$@"; do
+# Main script {{{1
+
+# Option parsing {{{2
+declare optstr=":-:d:rR:n:fom:MS:s:e:x:g:hV" 
+while getopts $optstr opt "$@"; do
+	if [ x"$opt" = x"-" ]; then
+		case "$OPTARG" in
+		(directory=*)
+		(directory)
+			opt="d"
+			;;
+
+		(return)
+			opt="r"
+			;;
+
+		(print-delim=*)
+		(print-delim)
+			opt="R"
+			;;
+
+		(repetitions=*)
+		(repetitions)
+			opt="n"
+			;;
+
+		(flags=*)
+		(flags)
+			opt="f"
+			;;
+
+		(open)
+			opt="o"
+			;;
+
+		(move=*)
+		(move)
+			opt="m"
+			;;
+
+		(move-here)
+			opt="M"
+			;;
+
+		(skip-expr=*)
+		(skip-expr)
+			opt="S"
+			;;
+
+		(skip-num=*)
+		(skip-num)
+			opt="s"
+			;;
+
+		(regex=*)
+		(regex)
+			opt="e"
+			;;
+
+		(exclude=*)
+		(exclude)
+			opt="x"
+			;;
+
+		(grep-flags=*)
+		(grep-flags)
+			opt="g"
+			;;
+
+		(help)
+			opt="h"
+			;;
+
+		(version)
+			opt="V"
+			;;
+
+		(*=*)
+			err '--'"${OPTARG%%=*}"' does not take an argument'
+			;;
+		(*)
+			err 'unknown option --'"${OPTARG%%=*}"''
+			;;
+		esac
+
+		if [ -n `expr $optstr : ".*\($opt:\)"` ]; then
+			if [ -n "${OPTARG#*=}" ]; then
+				OPTARG="${OPTARG#*=}"
+			else
+				shift
+				OPTARG="$1"
+			fi
+		fi
+	fi
+
 	case "$opt" in
 	(d)
-		if [[ ${OPTARG:0:1} == ~ ]]; then
+		if [[ ${OPTARG:0:1} == \~ ]]; then
 			dir="$HOME${OPTARG:1}"
 		elif [[ ${OPTARG:0:1} =~ \. ]]; then
 			dir="$PWD/$OPTARG"
@@ -188,15 +281,24 @@ while getopts ":d:rn:fom:MS:s:e:EvixhV" opt "$@"; do
 		;;
 	(r)
 		cmd="echo"
-		cmd_flgs=""
+		cmd_flgs="$cmd_flgs -n"
 		cmd_post=""
+
+		test -z "$print_delim" && print_delim=" "
+		;;
+	(R)
+		cmd="echo"
+		cmd_flgs="$cmd_flgs -n"
+		cmd_post=""
+
+		print_delim="$OPTARG"
 		;;
 	(n)
 		num_files="$OPTARG"
 		test -n "`echo "$num_files" | sed -e 's/[0-9]*//'`" \
 			&& err '-n takes only numeric arguments'
-		test "$num_files" -lt 1 \
-			&& err 'number of files must be set to at least 1' 
+		test "$num_files" -lt 0 \
+			&& err 'number of files must be set to at least 0' 
 		;;
 	(f)
 		cmd_flgs="$cmd_flgs $OPTARG"
@@ -233,20 +335,19 @@ while getopts ":d:rn:fom:MS:s:e:EvixhV" opt "$@"; do
 		skip_expr="-$OPTARG"
 		;;
 	(e)
-		excl_arr[$excl_len]="$OPTARG"
-		let "++excl_len"
-		;;
-	(E)
-		grep_flgs="$grep_flgs --extended-regexp"
-		;;
-	(v)
-		grep_flgs="$grep_flgs --invert-match"
-		;;
-	(i)
-		grep_flgs="$grep_flgs --ignore-case"
+		regex_arr[$regex_arr_len]="$OPTARG"
+		let "++regex_arr_len"
 		;;
 	(x)
-		grep_flgs="$grep_flgs --line-regexp"
+		excl_arr[$excl_arr_len]="$OPTARG"
+		let "++excl_arr_len"
+		;;
+	(g)
+		if [[ ${OPTARG:0:1} == - ]]; then
+			grep_flgs="$grep_flgs $OPTARG"
+		else
+			grep_flgs="$grep_flgs -$OPTARG"
+		fi
 		;;
 	(h)
 		usage
@@ -267,22 +368,37 @@ cmd_flgs="${cmd_flgs## }"
 
 parse_skip_expr
 
-: ${dir:="$HOME/Downloads"}
+: ${dir:="${DOWNLOAD_DIR:-"$HOME/Downloads"}"}
+# }}}2
 
-#the first is Darwin, and the second is GNU stat
+# the first is Darwin, the second is GNU stat
 stat --version &>/dev/null \
 	&& stat_cmd='stat --printf "%B\t%n\n" "${dir}"/*' \
 	|| stat_cmd='stat -f "%B%t%N" "${dir}"/*'
 
-#filepath_lst="`eval "$stat_cmd" | sort -rn | head -$num_files \
-#	| cut -d $'\t' -f 2 | tr '\n' '\t'`" &>/dev/null
+stat_fp_lst="`eval "$stat_cmd" | sort -rn | cut -d $'\t' -f 2`" &>/dev/null
 
-filepath_lst="`eval "$stat_cmd" | sort -rn | cut -d $'\t' -f 2`" &>/dev/null
-
-for (( i=0; i<excl_len; ++i )); do
-	filepath_lst="`echo "$filepath_lst" \
-		| grep $grep_flgs -e "${excl_arr[$i]}"`"
+filtered_fp_lst="$stat_fp_lst"
+for (( i=0; i<excl_arr_len; ++i )); do
+	filtered_fp_lst="`echo "$filtered_fp_lst" \
+		| eval grep $grep_flags --invert-match -e\'"${excl_arr[$i]}"\'`"
 done
+
+if [ $regex_arr_len -eq 0 ]; then
+	filepath_lst="$filtered_fp_lst"
+else
+	filepath_lst=""
+	for (( i=0; i<regex_arr_len; ++i )); do
+		append="`echo "$filtered_fp_lst" \
+			| eval grep $grep_flgs -e"${regex_arr[$i]}"`"
+
+		if [ -z $filepath_lst ]; then
+			filepath_lst="$append"
+		else
+			filepath_lst="$filepath_lst"$'\n'"$append"
+		fi
+	done
+fi
 
 filepath_lst="`echo "$filepath_lst" | tr '\n' '\t'`"
 
@@ -298,23 +414,14 @@ for (( dex=0,ct=0; dex<len && (num_files==0 || ct<num_files); ++dex )); do
 	skip_dex $dex
 	if [ ! $? -eq 1 ]; then
 		let "++ct"
-	
-		if [ -n "$cmd_flgs" ]; then
-			if [ -n "$cmd_post" ]; then
-				(exec $cmd "$cmd_flgs" "$filepath" "$cmd_post")
-			else
-				(exec $cmd "$cmd_flgs" "$filepath")
-			fi
-		else
-			if [ -n "$cmd_post" ]; then
-				(exec $cmd "$filepath" "$cmd_post")
-			else
-				(exec $cmd "$filepath")
-			fi
-		fi
+
+		eval $cmd $cmd_flgs \'"$filepath"\' $cmd_post
+
+		test -n "$print_delim" && echo -n "$print_delim"
 	fi
 done
 
 exit 0;
+# }}}1
 
-# vim: set ts=8 sw=8 noexpandtab tw=79:
+# vi: set ts=8 sw=8 noexpandtab tw=79:
