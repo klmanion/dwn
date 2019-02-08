@@ -40,7 +40,7 @@ usage() {
 			'added to a folder' 				\
 		"$name"' [-r | -o | -m destination | -M] '		\
 			'[-d directory] [-f flags] [-n num_files] '	\
-			'[-S skip_expr | -s skip_num] [-Evix] [-e regex]'
+			'[-S skip_expr | -s skip_num] [-g grep_flag] [-e regex]'
 	exit 64;
 }
 
@@ -174,7 +174,95 @@ skip_dex() {
 # Main script {{{1
 
 # Option parsing {{{2
-while getopts ":d:rR:n:fom:MS:s:e:x:g:hV" opt "$@"; do
+declare optstr=":-:d:rR:n:fom:MS:s:e:x:g:hV" 
+while getopts $optstr opt "$@"; do
+	if [ x"$opt" = x"-" ]; then
+		case "$OPTARG" in
+		(directory=*)
+		(directory)
+			opt="d"
+			;;
+
+		(return)
+			opt="r"
+			;;
+
+		(print-delim=*)
+		(print-delim)
+			opt="R"
+			;;
+
+		(repetitions=*)
+		(repetitions)
+			opt="n"
+			;;
+
+		(flags=*)
+		(flags)
+			opt="f"
+			;;
+
+		(open)
+			opt="o"
+			;;
+
+		(move=*)
+		(move)
+			opt="m"
+			;;
+
+		(move-here)
+			opt="M"
+			;;
+
+		(skip-expr=*)
+		(skip-expr)
+			opt="S"
+			;;
+
+		(skip-num=*)
+		(skip-num)
+			opt="s"
+			;;
+
+		(regex=*)
+		(regex)
+			opt="e"
+			;;
+
+		(exclude=*)
+		(exclude)
+			opt="x"
+			;;
+
+		(grep-flags=*)
+		(grep-flags)
+			opt="g"
+			;;
+
+		(help)
+			opt="h"
+			;;
+
+		(version)
+			opt="V"
+			;;
+
+		(*)
+			err 'unknown argument --'"${OPTARG%%=*}"''
+			;;
+		esac
+
+		if [ -n `expr $optstr : ".*\($opt:\)"` ]; then
+			if [ -n "${OPTARG#*=}" ]; then
+				OPTARG="${OPTARG#*=}"
+			else
+				shift
+				OPTARG="$1"
+			fi
+		fi
+	fi
+
 	case "$opt" in
 	(d)
 		if [[ ${OPTARG:0:1} == \~ ]]; then
