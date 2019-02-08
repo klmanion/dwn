@@ -28,9 +28,10 @@
 Using
 .Nm
 without any arguments outputs the path of the file most recently added
-to a directory, which, by default, is the
+to a directory, which, by default, is 
 .Pa ~/Downloads
-directory.
+or the path specified by
+.Ev DOWNLOAD_DIR .
 Inlining usage of
 .Nm
 in other commands allows the user to manipulate the file with the full power of
@@ -221,6 +222,14 @@ Print out every other file in the directory in order of their creation:
 .Pp
 Print out the five most recently created text files
 .Dl dwn -n5 -e'\.txt'
+.Sh ENVIRONMENT
+.Bl -tag
+.It Ev DOWNLOAD_DIR
+When set
+.Nm
+will use this directory by default rather than
+.Pa ~/Downloads .
+.El
 .Sh AUTHOR 
 dwn was created by
 .An Kurt L. Manion
