@@ -89,10 +89,10 @@ parse_skip_expr() {
 
 	# prefixed control characters accounted for;
 	# now, examine the index's in-/ex-clusion in the given ranges
-	suf="`echo "${skip_expr:saved}" | sed -e 's/ //g'`"
+	suf="`sed -e's/ //g' <<<${skip_expr:-$saved}`"
 
 	local IFS=','
-	read -r -a rng_arr <<< "$suf"
+	read -r -a rng_arr <<<${suf}
 
 	if [ $pat_flg -eq 1 ]; then
 		local _dash_flg=$dash_flg
@@ -288,7 +288,7 @@ while getopts $optstr opt "$@"; do
 		cmd_flgs="$cmd_flgs -n"
 		cmd_post=""
 
-		test -z "$print_delim" && print_delim=" "
+		test -z "$print_delim" && print_delim=' '
 		;;
 	(R)
 		cmd="echo"
@@ -334,7 +334,7 @@ while getopts $optstr opt "$@"; do
 		skip_expr="$OPTARG"
 		;;
 	(s)
-		test -n "`echo "$OPTARG" | sed -e 's/[0-9]*//'`" \
+		test -n "`sed -e's/[0-9]*//' <<<${OPTARG}`" \
 			&& err '-s takes only numeric arguments'
 		skip_expr="-$OPTARG"
 		;;
