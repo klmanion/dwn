@@ -273,14 +273,7 @@ while getopts $optstr opt "$@"; do
 
 	case "$opt" in
 	(d)
-		if [[ ${OPTARG:0:1} == \~ ]]; then
-			dir="$HOME${OPTARG:1}"
-		elif [[ ${OPTARG:0:1} =~ \. ]]; then
-			dir="$PWD/$OPTARG"
-		else
-			dir="$OPTARG"
-		fi
-		dir="`echo "$dir" | sed -e 's/\*$//; s/\/$//'`"
+		dir="`sed -e's/\*$//; s/\/$//' <<<${dir}`"
 		test ! -d "$dir" && err 'directory does not exist'
 		;;
 	(r)
