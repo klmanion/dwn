@@ -24,6 +24,7 @@
 .Op Ar action
 .Op Fl g Ar grep_flags
 .Op Fl e Ar regex
+.Op Fl x Ar regex
 .Sh DESCRIPTION
 Using
 .Nm
@@ -167,19 +168,18 @@ Given a number, that number of files are skipped.
 This is the same as
 .Sq \-S "-n" ,
 where n is the number passed to \fB\-s\fR.
-.It Fl e Ar regex , Fl Fl regex Ns = Ns Ar regex
-Only files matching the regular expression following this flag will be selected.
-Multiple \fB\-e\fR flags may be passed;
-this broadens the search.
+.It Fl e Ar regex , Fl Fl filter Ns = Ns Ar regex
+Only files matching the regular expression following will be selected.
+Multiple \fB\-e\fR flags may be passed to broadens the search.
 .It Fl x Ar regex , Fl Fl exclude Ns = Ns Ar regex
-Files matching the regular expression following this flag are ommited from the
+Files matching the regular expression following are ommited from the
 selection.
 .It Fl g Ar flags , Fl Fl grep-flags Ns = Ns Ar flags
 The flags following \fB\-g\fR are passed to
 .Xr grep 1 .
 For convenience the initial dash may be omitted.
 The flag \fB\-gv\fR may not be specified;
-use \fB\-x\fR ass opposed to \fB\-e\fR for this functionality.
+use \fB\-x\fR as opposed to \fB\-e\fR for this functionality.
 A selection of uses are:
 \fB\-gE\fR (use extended regular expressions);
 \fB\-gi\fR (ignore case); and
