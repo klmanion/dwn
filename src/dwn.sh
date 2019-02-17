@@ -3,7 +3,7 @@
 # created by: Kurt L. Manion
 # on: 3 April 2016
 # last modified: 10 Nov. 2018
-version="3.7.2"
+version="3.7.3"
 
 # Variable declarations {{{1
 declare cmd="echo"
@@ -176,7 +176,7 @@ skip_dex() {
 # Main script {{{1
 
 # Option parsing {{{2
-declare optstr=":-:d:rR:n:fom:MS:s:e:x:g:hV" 
+declare optstr=":-:d:rR:n:f:om:MS:s:e:x:g:hV" 
 while getopts $optstr opt "$@"; do
 	if [ x"$opt" = x"-" ]; then
 		case "$OPTARG" in
@@ -381,7 +381,6 @@ stat_fp_lst="`eval $stat_cmd | sort -rn | cut -d $'\t' -f 2`"
 
 filtered_fp_lst="`sed -e'/\/$/ s_/$__' -e's_^.*/__' <<<${stat_fp_lst}`"
 
-
 for (( i=0; i<excl_arr_len; ++i )); do
 	filtered_fp_lst="`eval grep $grep_flags --invert-match \
 		-e"'${excl_arr[$i]}'" \
@@ -399,10 +398,10 @@ else
 	done
 fi
 
-filepath_lst="`tr '\n' '\t' <<<"${filepath_lst}"`"
+filepath_lst="`tr '\n' '\t' <<<${filepath_lst}`"
 
 IFS=$'\t'
-read -r -a filepath_arr <<<"${filepath_lst}"
+read -r -a filepath_arr <<<${filepath_lst}
 
 len=${#filepath_arr[@]}
 for (( dex=0,ct=0; dex<len && (num_files==0 || ct<num_files); ++dex )); do
