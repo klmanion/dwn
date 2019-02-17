@@ -2,8 +2,8 @@
 #dwn
 # created by: Kurt L. Manion
 # on: 3 April 2016
-# last modified: 10 Nov. 2018
-version="3.7.3"
+# last modified: 17 Feb. 2019
+version="3.7.5"
 
 # Variable declarations {{{1
 declare cmd="echo"
@@ -180,6 +180,8 @@ skip_dex() {
 declare optstr=":-:d:rR:n:f:om:MS:s:e:x:g:hV" 
 while getopts $optstr opt "$@"; do
 	if [ x"$opt" = x"-" ]; then
+		test -z "$OPTARG" && break
+
 		case "$OPTARG" in
 		(directory=*)
 		(directory)
@@ -228,8 +230,8 @@ while getopts $optstr opt "$@"; do
 			opt="s"
 			;;
 
-		(regex=*)
-		(regex)
+		(filter=*)
+		(filter)
 			opt="e"
 			;;
 
