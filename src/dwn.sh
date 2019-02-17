@@ -3,11 +3,12 @@
 # created by: Kurt L. Manion
 # on: 3 April 2016
 # last modified: 10 Nov. 2018
-version="3.7.0"
+version="3.7.1"
 
 # Variable declarations {{{1
 declare cmd="echo"
 declare cmd_flgs=""
+declare add_flgs=""
 declare cmd_post=""
 
 declare print_delim=""
@@ -30,7 +31,7 @@ declare regex_arr_len=0
 declare -a excl_arr
 declare excl_arr_len=0
 
-declare grep_flgs=""
+declare grep_flgs="-s"
 
 declare name="`basename "${0:-dwn}"`"
 
@@ -301,7 +302,7 @@ while getopts $optstr opt "$@"; do
 			&& err 'number of files must be set to at least 0' 
 		;;
 	(f)
-		cmd_flgs="$cmd_flgs $OPTARG"
+		add_flgs="$add_flgs $OPTARG"
 		;;
 	(o)
 		if [[ x"$OSTYPE" == x"linux-gnu" ]]; then
@@ -364,7 +365,7 @@ shift $((OPTIND-1))
 
 test $# -gt 0 && err 'extraneous arguments'
 
-cmd_flgs="${cmd_flgs## }"
+cmd_flgs="$cmd_flgs $add_flgs"
 
 parse_skip_expr
 
@@ -376,12 +377,15 @@ stat --version &>/dev/null \
 	&& stat_cmd='stat --printf "%B\t%n\n" "${dir}"/*' \
 	|| stat_cmd='stat -f "%B%t%N" "${dir}"/*'
 
-stat_fp_lst="`eval "$stat_cmd" | sort -rn | cut -d $'\t' -f 2`" &>/dev/null
+stat_fp_lst="`eval $stat_cmd | sort -rn | cut -d $'\t' -f 2`"
 
-filtered_fp_lst="$stat_fp_lst"
+filtered_fp_lst="`sed -e'/\/$/ s_/$__' -e's_^.*/__' <<<${stat_fp_lst}`"
+
+
 for (( i=0; i<excl_arr_len; ++i )); do
-	filtered_fp_lst="`echo "$filtered_fp_lst" \
-		| eval grep $grep_flags --invert-match -e\'"${excl_arr[$i]}"\'`"
+	filtered_fp_lst="`eval grep $grep_flags --invert-match \
+		-e"'${excl_arr[$i]}'" \
+		<<<${filtered_fp_lst}`"
 done
 
 if [ $regex_arr_len -eq 0 ]; then
@@ -389,21 +393,16 @@ if [ $regex_arr_len -eq 0 ]; then
 else
 	filepath_lst=""
 	for (( i=0; i<regex_arr_len; ++i )); do
-		append="`echo "$filtered_fp_lst" \
-			| eval grep $grep_flgs -e"${regex_arr[$i]}"`"
-
-		if [ -z $filepath_lst ]; then
-			filepath_lst="$append"
-		else
-			filepath_lst="$filepath_lst"$'\n'"$append"
-		fi
+		filepath_lst="${filepath_lst}`eval grep $grep_flgs \
+			-e"'${regex_arr[$i]}'" \
+			<<<${filtered_fp_lst}`"
 	done
 fi
 
-filepath_lst="`echo "$filepath_lst" | tr '\n' '\t'`"
+filepath_lst="`tr '\n' '\t' <<<"${filepath_lst}"`"
 
 IFS=$'\t'
-read -r -a filepath_arr <<< "$filepath_lst"
+read -r -a filepath_arr <<<"${filepath_lst}"
 
 len=${#filepath_arr[@]}
 for (( dex=0,ct=0; dex<len && (num_files==0 || ct<num_files); ++dex )); do
@@ -415,7 +414,7 @@ for (( dex=0,ct=0; dex<len && (num_files==0 || ct<num_files); ++dex )); do
 	if [ ! $? -eq 1 ]; then
 		let "++ct"
 
-		eval $cmd $cmd_flgs \'"$filepath"\' $cmd_post
+		eval $cmd $cmd_flgs "'$dir/$filepath'" $cmd_post
 
 		test -n "$print_delim" && echo -n "$print_delim"
 	fi
