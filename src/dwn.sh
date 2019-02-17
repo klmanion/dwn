@@ -405,14 +405,11 @@ for (( dex=0,ct=0; dex<len && (num_files==0 || ct<num_files); ++dex )); do
 
 	test -z "$filepath" && err 'stat command failed'
 
-	skip_dex $dex
-	if [ ! $? -eq 1 ]; then
-		let "++ct"
+	skip_dex $dex; test $? -eq 1 && continue
 
-		eval $cmd $cmd_flgs "'$dir/$filepath'" $cmd_post
-
-		test -n "$print_delim" && echo -n "$print_delim"
-	fi
+	let "++ct"
+	eval $cmd $cmd_flgs "'$dir/$filepath'" $cmd_post
+	test -n "$print_delim" && echo -n "$print_delim"
 done
 
 exit 0;
