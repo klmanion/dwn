@@ -37,12 +37,13 @@ declare name="`basename "${0:-dwn}"`"
 
 # Function declarations {{{1
 usage() {
-	printf '%s%s\n%s%s\n\t%s\n' 				\
+	printf '%s%s\n%s\t%s\n\t%s\n\t%s\n\t%s\n'			\
 		'usage: '"$name"' -- return path of file most recently '\
-			'added to a folder' 				\
-		"$name"' [-r | -o | -m destination | -M] '		\
-			'[-d directory] [-f flags] [-n num_files] '	\
-			'[-S skip_expr | -s skip_num] [-g grep_flag] [-e regex]'
+			'added to a directory' 				\
+		"$name" '[-r | -o | -m destination | -M]'		\
+			'[-d directory] [-f flags] [-n num_files]'	\
+			'[-S skip_expr | -s skip_num]'			\
+		        '[-g grep_flag] [-e regex] [-x regex]'
 	exit 64;
 }
 
