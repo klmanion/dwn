@@ -29,10 +29,20 @@
 Using
 .Nm
 without any arguments outputs the path of the file most recently added
-to a directory, which, by default, is 
+to the downloads directory,
+which is obtained from
+.Ev DOWNLOAD_DIR ,
+or
+.Ev DOWNLOADS
+in that order.
+A specific default directory for
+.Nm
+may be specified by
+.Ev DWN_DIR .
+If none of these are present in the enviroment
 .Pa ~/Downloads
-or the path specified by
-.Ev DOWNLOAD_DIR .
+will be understood as the default.
+
 Inlining usage of
 .Nm
 in other commands allows the user to manipulate the file with the full power of
@@ -225,10 +235,31 @@ Print out the five most recently created text files
 .Sh ENVIRONMENT
 .Bl -tag
 .It Ev DOWNLOAD_DIR
-When set
-.Nm
-will use this directory by default rather than
-.Pa ~/Downloads .
+The directory path contained therein is used as the default download
+directory,
+even if it does not exist.
+This has precedence over
+.Ev DOWNLOADS .
+It is assumed that this has been set intentionally,
+so if set to the empty string no default is set
+and the \fB\-d\fR option must always be used when implementing
+.Nm .
+.It DOWNLOADS
+A secondary environment variable checked if
+.Ev DOWNLAD_DIR
+is unset.
+Contrary to the latter,
+if its contained path does not exist or is empty it is ignored
+and
+.Pa ~/Downloads
+is used.
+.It DWN_DIR
+May be used to specify a default directory specifically for
+.Nm .
+This has highest precedence.
+If set to the empty string
+.Pa ~/Downloads
+is used.
 .El
 .Sh AUTHOR 
 dwn was created by
@@ -237,4 +268,4 @@ on 3 April 2016.
 .Sh CONTACT
 .Aq klmanion@gmail.com .
 .Sh VERSION
-version 3.7.0 \(em 8 February 2019.
+version 3.8.0 \(em 20 February 2019.
