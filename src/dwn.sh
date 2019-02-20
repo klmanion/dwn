@@ -3,7 +3,7 @@
 # created by: Kurt L. Manion
 # on: 3 April 2016
 # last modified: 17 Feb. 2019
-version="3.7.5"
+version="3.8.0"
 
 # Variable declarations {{{1
 declare cmd="echo"
@@ -365,7 +365,7 @@ cmd_flgs="$cmd_flgs $add_flgs"
 
 parse_skip_expr
 
-: ${dir:="${DOWNLOAD_DIR:-"$HOME/Downloads"}"}
+: ${dir:="${DWN_DIR:-"${DOWNLOAD_DIR:-"${DOWNLOADS:-"$HOME/Downloads"}"}"}"}
 # }}}2
 
 # the first is Darwin, the second is GNU stat
