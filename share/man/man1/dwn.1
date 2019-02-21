@@ -236,30 +236,20 @@ Print out the five most recently created text files
 .Bl -tag
 .It Ev DOWNLOAD_DIR
 The directory path contained therein is used as the default download
-directory,
-even if it does not exist.
+directory.
 This has precedence over
 .Ev DOWNLOADS .
-It is assumed that this has been set intentionally,
-so if set to the empty string no default is set
-and the \fB\-d\fR option must always be used when implementing
-.Nm .
-.It DOWNLOADS
-A secondary environment variable checked if
-.Ev DOWNLAD_DIR
-is unset.
-Contrary to the latter,
-if its contained path does not exist or is empty it is ignored
-and
+When set to the empty string
 .Pa ~/Downloads
 is used.
+.It DOWNLOADS
+A secondary environment variable checked if
+.Ev DOWNLOAD_DIR
+is unset.
 .It DWN_DIR
 May be used to specify a default directory specifically for
 .Nm .
 This has highest precedence.
-If set to the empty string
-.Pa ~/Downloads
-is used.
 .El
 .Sh AUTHOR 
 dwn was created by

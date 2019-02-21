@@ -365,7 +365,9 @@ cmd_flgs="$cmd_flgs $add_flgs"
 
 parse_skip_expr
 
-: ${dir:="${DWN_DIR:-"${DOWNLOAD_DIR:-"${DOWNLOADS:-"$HOME/Downloads"}"}"}"}
+: ${dir:="${DWN_DIR-"${DOWNLOAD_DIR-"${DOWNLOADS}"}"}"}
+: ${dir:="$HOME/Downloads"}
+test ! -d "$dir" && err 'specified directory '"$dir"' not found'
 # }}}2
 
 # the first is Darwin, the second is GNU stat
