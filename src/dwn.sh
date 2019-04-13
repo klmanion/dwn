@@ -273,8 +273,7 @@ while getopts $optstr opt "$@"; do
 
 	case "$opt" in
 	(d)
-		dir="`sed -e's/\*$//; s/\/$//' <<<${dir}`"
-		test ! -d "$dir" && err 'directory does not exist'
+		dir="`sed -e's/\*$//; s/\/$//' <<<${OPTARG}`"
 		;;
 	(r)
 		cmd="echo"
@@ -367,6 +366,7 @@ parse_skip_expr
 
 : ${dir:="${DWN_DIR-"${DOWNLOAD_DIR-"${DOWNLOADS}"}"}"}
 : ${dir:="$HOME/Downloads"}
+eval dir="$dir"
 test ! -d "$dir" && err 'specified directory '"$dir"' not found'
 # }}}2
 
