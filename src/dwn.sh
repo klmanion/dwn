@@ -275,6 +275,7 @@ while getopts $optstr opt "$@"; do
 	(d)
 		dir="`sed -e's/\*$//; s/\/$//' <<<${OPTARG}`"
 		;;
+
 	(r)
 		cmd="echo"
 		cmd_flgs="$cmd_flgs -n"
@@ -282,6 +283,7 @@ while getopts $optstr opt "$@"; do
 
 		test -z "$print_delim" && print_delim=' '
 		;;
+
 	(R)
 		cmd="echo"
 		cmd_flgs="$cmd_flgs -n"
@@ -289,6 +291,7 @@ while getopts $optstr opt "$@"; do
 
 		print_delim="$OPTARG"
 		;;
+
 	(n)
 		num_files="$OPTARG"
 		test -n "`echo "$num_files" | sed -e 's/[0-9]*//'`" \
@@ -296,6 +299,7 @@ while getopts $optstr opt "$@"; do
 		test "$num_files" -lt 0 \
 			&& err 'number of files must be set to at least 0' 
 		;;
+
 	(f)
 		add_flgs="$add_flgs $OPTARG"
 		;;
@@ -308,6 +312,7 @@ while getopts $optstr opt "$@"; do
 			cmd="open"
 		fi
 		;;
+
 	(m)
 		cmd="mv"
 
@@ -315,6 +320,7 @@ while getopts $optstr opt "$@"; do
 
 		cmd_post="$OPTARG"
 		;;
+
 	(M)
 		cmd="mv"
 
@@ -322,22 +328,27 @@ while getopts $optstr opt "$@"; do
 
 		cmd_post="$PWD"
 		;;
+
 	(S)
 		skip_expr="$OPTARG"
 		;;
+
 	(s)
 		test -n "`sed -e's/[0-9]*//' <<<${OPTARG}`" \
 			&& err '-s takes only numeric arguments'
 		skip_expr="-$OPTARG"
 		;;
+
 	(e)
 		regex_arr[$regex_arr_len]="$OPTARG"
 		let "++regex_arr_len"
 		;;
+
 	(x)
 		excl_arr[$excl_arr_len]="$OPTARG"
 		let "++excl_arr_len"
 		;;
+
 	(g)
 		if [[ ${OPTARG:0:1} == - ]]; then
 			grep_flgs="$grep_flgs $OPTARG"
@@ -345,12 +356,15 @@ while getopts $optstr opt "$@"; do
 			grep_flgs="$grep_flgs -$OPTARG"
 		fi
 		;;
+
 	(h)
 		usage
 		;;
+
 	(V)
 		version
 		;;
+
 	(\?)
 		err 'unknown argument '"$OPTARG"''
 		;;
