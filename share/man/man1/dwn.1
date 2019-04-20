@@ -124,7 +124,7 @@ directory.
 By default it does not overwrite files.
 .It Fl M , Fl Fl move-here
 An alias for
-.Sq dwn -m Ns \ . .
+.Sq dwn \-m Ns \ . .
 Moves the obtained filepath or filepaths to the current working directory.
 By default it does not overwrite files.
 .It Fl d Ar dir , Fl Fl directory Ns = Ns Ar dir
@@ -176,7 +176,7 @@ but, rather, selected.
 .It Fl s Ar num , Fl Fl skip-num Ns = Ns Ar num
 Given a number, that number of files are skipped.
 This is the same as
-.Sq \-S "-n" ,
+.Sq \-S "\-n" ,
 where n is the number passed to \fB\-s\fR.
 .It Fl e Ar regex , Fl Fl filter Ns = Ns Ar regex
 Only files matching the regular expression following will be selected.
@@ -200,38 +200,38 @@ manpage for a full listing of options which may be passed to grep.
 .El
 .Sh EXAMPLES
 Print out the filepath most recently added to the desktop:
-.Dl dwn -d~/Desktop
+.Dl dwn \-d~/Desktop
 .Pp
 Print the file's contents to the command-line:
-.Dl dwn -d~/Desktop | cat -
+.Dl dwn \-d~/Desktop | cat \-
 .Pp
 Open the most recently downloaded file:
-.Dl dwn -o
+.Dl dwn \-o
 .Pp
 Open the most recently downloaded file without the convenience form:
 .Dl open `dwn`
 .Pp
 Open the five most recently downloaded files without the convenience form:
-.Dl eval open `dwn -rn5`
+.Dl eval open `dwn \-rn5`
 .Pp
 Move the most recently downloaded file to the Documents folder:
-.Dl dwn -m~/Documents
+.Dl dwn \-m~/Documents
 .Pp
 Move the five most recently downloaded files to the Documents folder.
-.Dl dwn -m~/Documents -n5
+.Dl dwn \-m~/Documents \-n5
 .Pp
 Print out ten total filepaths, but skip a few that would otherwise have been
 printed:
-.Dl dwn -n10 -S Ns Qq 2-5,8
+.Dl dwn \-n10 \-S Ns Qq 2-5,8
 .Pp
 Print out the third and fifth filepath:
-.Dl dwn -S Ns Qq ^3,5
+.Dl dwn \-S Ns Qq ^3,5
 .Pp
 Print out every other file in the directory in order of their creation:
-.Dl dwn -S Ns Qq :2
+.Dl dwn \-S Ns Qq :2
 .Pp
 Print out the five most recently created text files
-.Dl dwn -n5 -e'\.txt'
+.Dl dwn \-n5 \-e'\.txt'
 .Sh ENVIRONMENT
 .Bl -tag
 .It Ev DOWNLOAD_DIR
