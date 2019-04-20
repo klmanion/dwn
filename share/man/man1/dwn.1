@@ -131,6 +131,11 @@ By default it does not overwrite files.
 This overrides the default directory,
 .Pa ~/Downloads ,
 from which the selection is obtained.
+.It Fl h , Fl Fl here
+Similar to `\-d.' in that the current directory is searched
+rather than the download directory,
+but, additionally, expands the obtained path,
+rather than emiting the relative path.
 .It Fl n Ar num , Fl Fl repetitions Ns = Ns Ar num
 Given a numeric argument, instead of obtaining a filepath,
 .Nm
