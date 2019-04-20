@@ -177,7 +177,7 @@ skip_dex() {
 # Main script {{{1
 
 # Option parsing {{{2
-declare optstr=":-:d:rR:n:f:om:MS:s:e:x:g:hV" 
+declare optstr=":-:d:hrR:n:f:om:MS:s:e:x:g:hV" 
 while getopts $optstr opt "$@"; do
 	if [ x"$opt" = x"-" ]; then
 		test -z "$OPTARG" && break
@@ -185,72 +185,76 @@ while getopts $optstr opt "$@"; do
 		case "$OPTARG" in
 		(directory=*)
 		(directory)
-			opt="d"
+			opt='d'
+			;;
+
+		(here)
+			opt='h'
 			;;
 
 		(return)
-			opt="r"
+			opt='r'
 			;;
 
 		(print-delim=*)
 		(print-delim)
-			opt="R"
+			opt='R'
 			;;
 
 		(repetitions=*)
 		(repetitions)
-			opt="n"
+			opt='n'
 			;;
 
 		(flags=*)
 		(flags)
-			opt="f"
+			opt='f'
 			;;
 
 		(open)
-			opt="o"
+			opt='o'
 			;;
 
 		(move=*)
 		(move)
-			opt="m"
+			opt='m'
 			;;
 
 		(move-here)
-			opt="M"
+			opt='M'
 			;;
 
 		(skip-expr=*)
 		(skip-expr)
-			opt="S"
+			opt='S'
 			;;
 
 		(skip-num=*)
 		(skip-num)
-			opt="s"
+			opt='s'
 			;;
 
 		(filter=*)
 		(filter)
-			opt="e"
+			opt='e'
 			;;
 
 		(exclude=*)
 		(exclude)
-			opt="x"
+			opt='x'
 			;;
 
 		(grep-flags=*)
 		(grep-flags)
-			opt="g"
+			opt='g'
 			;;
 
 		(help)
-			opt="h"
+			opt='h'
 			;;
 
 		(version)
-			opt="V"
+			opt='V'
 			;;
 
 		(*=*)
@@ -274,6 +278,10 @@ while getopts $optstr opt "$@"; do
 	case "$opt" in
 	(d)
 		dir="`sed -e's/\*$//; s/\/$//' <<<${OPTARG}`"
+		;;
+
+	(h)
+		dir="$PWD"
 		;;
 
 	(r)
