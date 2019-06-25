@@ -66,10 +66,10 @@ newline character.
 When inlining multiple filepaths from
 .Nm
 into another command's invocation
-\fB\-r\fR must be used to delimit these filepaths with spaces
-and enclose the filepaths in strong quotes.
-This is necessary for the command substitution to work on files which contain
-characters that have meaning for the shell and, thus, need to be quoted.
+\fB\-r\fR may be used to delimit these filepaths with spaces rather than
+newlines.
+This is sometimes necessary for the command substitution to work on files which contain
+characters that have specieal meaning for the shell.
 This is not always necessary when piping
 .Nm Ns 's
 output to another program.
@@ -90,7 +90,7 @@ The \fB\-s\fR option, which is a convenience form for the more comprehensive
 obtained.
 This is useful for when one wishes to obtain a filepath or sequence of
 filepaths that had been the most recent in a directory,
-but since then have been pushed back by a few newer files.
+but, since then, have been pushed back by newer files.
 The \fB\-S\fR option allows for more involved use cases.
 .Pp
 The fifth synopsis line contains the options that allow one to match 
@@ -129,10 +129,13 @@ Moves the obtained filepath or filepaths to the current working directory.
 By default it does not overwrite files.
 .It Fl d Ar dir , Fl Fl directory Ns = Ns Ar dir
 This overrides the default directory,
+usually
 .Pa ~/Downloads ,
 from which the selection is obtained.
 .It Fl h , Fl Fl here
-Similar to `\-d.' in that the current directory is searched
+Similar to
+.Sq \-d.
+in that the current directory is searched
 rather than the download directory,
 but, additionally, expands the obtained path,
 rather than emiting the relative path.
@@ -185,7 +188,7 @@ This is the same as
 where n is the number passed to \fB\-s\fR.
 .It Fl e Ar regex , Fl Fl filter Ns = Ns Ar regex
 Only files matching the regular expression following will be selected.
-Multiple \fB\-e\fR flags may be passed to broadens the search.
+Multiple \fB\-e\fR flags may be passed to broaden the search.
 .It Fl x Ar regex , Fl Fl exclude Ns = Ns Ar regex
 Files matching the regular expression following are ommited from the
 selection.
@@ -239,6 +242,10 @@ Print out the five most recently created text files
 .Dl dwn \-n5 \-e'\.txt'
 .Sh ENVIRONMENT
 .Bl -tag
+.It DWN_DIR
+May be used to specify a default directory specifically for
+.Nm .
+This has highest precedence.
 .It Ev DOWNLOAD_DIR
 The directory path contained therein is used as the default download
 directory.
@@ -251,10 +258,6 @@ is used.
 A secondary environment variable checked if
 .Ev DOWNLOAD_DIR
 is unset.
-.It DWN_DIR
-May be used to specify a default directory specifically for
-.Nm .
-This has highest precedence.
 .El
 .Sh AUTHOR 
 dwn was created by
