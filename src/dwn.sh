@@ -311,6 +311,7 @@ while getopts $optstr opt "$@"; do
 	(f)
 		add_flgs="$add_flgs $OPTARG"
 		;;
+
 	(o)
 		if [[ x"$OSTYPE" == x"linux-gnu" ]]; then
 			cmd="xdg-open"
@@ -392,9 +393,9 @@ eval dir="$dir"
 test ! -d "$dir" && err 'specified directory '"$dir"' not found'
 # }}}2
 
-# the first is Darwin, the second is GNU stat
+# the first is BSD stat, the second is GNU stat
 stat --version &>/dev/null \
-	&& stat_cmd='stat --printf "%B\t%n\n" "${dir}"/*' \
+	&& stat_cmd='stat -printf "%B\t%n\n" "${dir}"/*' \
 	|| stat_cmd='stat -f "%B%t%N" "${dir}"/*'
 
 stat_fp_lst="`eval $stat_cmd | sort -rn | cut -d $'\t' -f 2`"
@@ -439,4 +440,4 @@ done
 exit 0;
 # }}}1
 
-# vi: set ts=8 sw=8 noexpandtab tw=79:
+# vi: set ts=2 sw=2 noexpandtab tw=79:
