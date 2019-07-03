@@ -37,13 +37,13 @@ declare name="`basename "${0:-dwn}"`"
 
 # Function declarations {{{1
 usage() {
-	printf '%s%s\n%s\t%s\n\t%s\n\t%s\n\t%s\n'			\
-		'usage: '"$name"' -- return path of file most recently '\
-			'added to a directory' 				\
-		"$name" '[-r | -o | -m destination | -M]'		\
-			'[-d directory] [-f flags] [-n num_files]'	\
-			'[-S skip_expr | -s skip_num]'			\
-		        '[-g grep_flag] [-e regex] [-x regex]'
+	printf '%s%s\n%s\t%s\n\t%s\n\t%s\n\t%s\n' \
+		'usage: '"$name"' -- return path of file most recently ' \
+			'added to a directory' \
+		"$name" '[-r | -o | -m destination | -M]' \
+			'[-d directory] [-f flags] [-n num_files]' \
+			'[-S skip_expr | -s skip_num]' \
+			'[-g grep_flag] [-e regex] [-x regex]'
 	exit 64;
 }
 
@@ -322,20 +322,18 @@ while getopts $optstr opt "$@"; do
 		fi
 		;;
 
-	(m)
+	(m | M)
 		cmd="mv"
 
 		cmd_flgs="$cmd_flgs -n"
 
-		cmd_post="$OPTARG"
-		;;
+		if [ $opt = "m" ]; then
+			cmd_post="$OPTARG"
+		else
+			cmd_post="$PWD"
+		fi
 
-	(M)
-		cmd="mv"
-
-		cmd_flgs="$cmd_flgs -n"
-
-		cmd_post="$PWD"
+		cmd_post="`sed -e's/[|&;()<> ]./\\\&/g' <<<"${cmd_post}"`"
 		;;
 
 	(S)
@@ -433,7 +431,8 @@ for (( dex=0,ct=0; dex<len && (num_files==0 || ct<num_files); ++dex )); do
 	skip_dex $dex; test $? -eq 1 && continue
 
 	let "++ct"
-	eval $cmd $cmd_flgs "'$dir/$filepath'" $cmd_post
+	escaped_fp="`sed -e's/[|&;()<> ]./\\\&/g' <<<"${filepath}"`"
+	eval $cmd $cmd_flgs "$dir/$escaped_fp" $cmd_post
 	test -n "$print_delim" && echo -n "$print_delim"
 done
 
