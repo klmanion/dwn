@@ -3,7 +3,7 @@
 # created by: Kurt L. Manion
 # on: 3 April 2016
 # last modified: 17 Feb. 2019
-version="3.8.1"
+version="3.9.0"
 
 # Variable declarations {{{1
 declare cmd="echo"
