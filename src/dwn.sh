@@ -89,10 +89,10 @@ parse_skip_expr() {
 
 	# prefixed control characters accounted for;
 	# now, examine the index's in-/ex-clusion in the given ranges
-	suf="`sed -e's/ //g' <<<${skip_expr:-$saved}`"
+	suf="`sed -e's/ //g' <<<"${skip_expr:-$saved}"`"
 
 	local IFS=','
-	read -r -a rng_arr <<<${suf}
+	read -r -a rng_arr <<<"${suf}"
 
 	if [ $pat_flg -eq 1 ]; then
 		local _dash_flg=$dash_flg
@@ -277,7 +277,7 @@ while getopts $optstr opt "$@"; do
 
 	case "$opt" in
 	(d)
-		dir="`sed -e's/\*$//; s/\/$//' <<<${OPTARG}`"
+		dir="`sed -e's/\*$//; s/\/$//' <<<"${OPTARG}"`"
 		;;
 
 	(h)
@@ -341,7 +341,7 @@ while getopts $optstr opt "$@"; do
 		;;
 
 	(s)
-		test -n "`sed -e's/[0-9]*//' <<<${OPTARG}`" \
+		test -n "`sed -e's/[0-9]*//' <<<"${OPTARG}"`" \
 			&& err '-s takes only numeric arguments'
 		skip_expr="-$OPTARG"
 		;;
@@ -398,12 +398,15 @@ stat --version &>/dev/null \
 
 stat_fp_lst="`eval $stat_cmd | sort -rn | cut -d $'\t' -f 2`"
 
-filtered_fp_lst="`sed -e'/\/$/ s_/$__' -e's_^.*/__' <<<${stat_fp_lst}`"
+filtered_fp_lst="`sed -n \
+	-e'/\/$/ s_/$__' \
+	-e's_[^/]*/__g; P' \
+	<<<"${stat_fp_lst}"`"
 
 for (( i=0; i<excl_arr_len; ++i )); do
 	filtered_fp_lst="`eval grep $grep_flags --invert-match \
 		-e"'${excl_arr[$i]}'" \
-		<<<${filtered_fp_lst}`"
+		<<<"${filtered_fp_lst}"`"
 done
 
 if [ $regex_arr_len -eq 0 ]; then
@@ -413,14 +416,13 @@ else
 	for (( i=0; i<regex_arr_len; ++i )); do
 		filepath_lst="${filepath_lst}`eval grep $grep_flgs \
 			-e"'${regex_arr[$i]}'" \
-			<<<${filtered_fp_lst}`"
+			<<<"${filtered_fp_lst}"`"
 	done
 fi
 
-filepath_lst="`tr '\n' '\t' <<<${filepath_lst}`"
-
 IFS=$'\t'
-read -r -a filepath_arr <<<${filepath_lst}
+filepath_lst="`tr '\n' '\t' <<<"${filepath_lst}"`"
+read -r -a filepath_arr <<<"${filepath_lst}"
 
 len=${#filepath_arr[@]}
 for (( dex=0,ct=0; dex<len && (num_files==0 || ct<num_files); ++dex )); do
@@ -432,6 +434,7 @@ for (( dex=0,ct=0; dex<len && (num_files==0 || ct<num_files); ++dex )); do
 
 	let "++ct"
 	escaped_fp="`sed -e's/[|&;()<> ]./\\\&/g' <<<"${filepath}"`"
+
 	eval $cmd $cmd_flgs "$dir/$escaped_fp" $cmd_post
 	test -n "$print_delim" && echo -n "$print_delim"
 done
