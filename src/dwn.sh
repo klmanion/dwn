@@ -3,7 +3,7 @@
 # created by: Kurt L. Manion
 # on: 3 April 2016
 # last modified: 17 Feb. 2019
-version="3.9.1"
+version="3.9.2"
 
 # Variable declarations {{{1
 declare cmd="echo"
@@ -433,7 +433,7 @@ for (( dex=0,ct=0; dex<len && (num_files==0 || ct<num_files); ++dex )); do
 	skip_dex $dex; test $? -eq 1 && continue
 
 	let "++ct"
-	escaped_fp="`sed -e's/[|&;()<> ]./\\\&/g' <<<"${filepath}"`"
+	escaped_fp="`sed -e's/[|&;()<> ]/\\\&/g' <<<"${filepath}"`"
 
 	eval $cmd $cmd_flgs "$dir/$escaped_fp" $cmd_post
 	test -n "$print_delim" && echo -n "$print_delim"
