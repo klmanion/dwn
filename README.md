@@ -1,6 +1,6 @@
 # dwn
 
-dwn -- Shell script to open file most recently downloaded to a folder
+dwn -- Shell script to manipulate file or files most recently downloaded to a directory
 
 The intention is to preform actions on the file most recently added to the ~/Downloads folder, but dwn can be used on any folder specified with the -d flag.
 
