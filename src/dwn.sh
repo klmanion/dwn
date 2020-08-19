@@ -24,6 +24,7 @@ declare pat_flg=0
 declare pat_len
 declare neg_flg=0
 declare dash_flg=0
+declare num_flg=0
 
 declare -a regex_arr
 declare regex_arr_len=0
@@ -177,7 +178,7 @@ skip_dex() {
 # Main script {{{1
 
 # Option parsing {{{2
-declare optstr=":-:d:hrR:n:f:om:MS:s:e:x:g:hV" 
+declare optstr=":-:d:hrR:n:Nf:om:MS:s:e:x:g:hV" 
 while getopts $optstr opt "$@"; do
 	if [ x"$opt" = x"-" ]; then
 		test -z "$OPTARG" && break
@@ -200,6 +201,11 @@ while getopts $optstr opt "$@"; do
 		(repetitions=*) ;&
 		(repetitions)
 			opt='n'
+			;;
+
+		(number) ;&
+		(number-files)
+			opt='N'
 			;;
 
 		(flags=*) ;&
@@ -298,6 +304,10 @@ while getopts $optstr opt "$@"; do
 			&& err '-n takes only numeric arguments'
 		test "$num_files" -lt 0 \
 			&& err 'number of files must be set to at least 0' 
+		;;
+
+	(N)
+		num_flg=1
 		;;
 
 	(f)
@@ -424,11 +434,15 @@ for (( dex=0,ct=0; dex<len && (num_files==0 || ct<num_files); ++dex )); do
 
 	skip_dex $dex; test $? -eq 1 && continue
 
-	let "++ct"
 	escaped_fp="`sed -e's/[|&;()<> '\'']/\\\&/g' <<<"${filepath}"`"
 
-	eval $cmd $cmd_flgs "$dir/$escaped_fp" $cmd_post
+	filename="$dir/$escaped_fp"
+	test $num_flg -eq 1 && filename="$ct $filename"
+
+	eval $cmd $cmd_flgs "$filename" $cmd_post
 	test -n "$print_delim" && echo -n "$print_delim"
+
+	let "++ct"
 done
 
 exit 0;
