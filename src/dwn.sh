@@ -3,7 +3,7 @@
 # created by: Kurt L. Manion
 # on: 3 April 2016
 # last modified: 17 Feb. 2019
-version="3.9.2"
+version="3.10.0"
 
 # Variable declarations {{{1
 declare cmd="echo"
@@ -183,30 +183,26 @@ while getopts $optstr opt "$@"; do
 		test -z "$OPTARG" && break
 
 		case "$OPTARG" in
-		(directory=*)
+		(directory=*) ;&
 		(directory)
 			opt='d'
-			;;
-
-		(here)
-			opt='h'
 			;;
 
 		(return)
 			opt='r'
 			;;
 
-		(print-delim=*)
+		(print-delim=*) ;&
 		(print-delim)
 			opt='R'
 			;;
 
-		(repetitions=*)
+		(repetitions=*) ;&
 		(repetitions)
 			opt='n'
 			;;
 
-		(flags=*)
+		(flags=*) ;&
 		(flags)
 			opt='f'
 			;;
@@ -215,7 +211,7 @@ while getopts $optstr opt "$@"; do
 			opt='o'
 			;;
 
-		(move=*)
+		(move=*) ;&
 		(move)
 			opt='m'
 			;;
@@ -224,27 +220,27 @@ while getopts $optstr opt "$@"; do
 			opt='M'
 			;;
 
-		(skip-expr=*)
+		(skip-expr=*) ;&
 		(skip-expr)
 			opt='S'
 			;;
 
-		(skip-num=*)
+		(skip-num=*) ;&
 		(skip-num)
 			opt='s'
 			;;
 
-		(filter=*)
+		(filter=*) ;&
 		(filter)
 			opt='e'
 			;;
 
-		(exclude=*)
+		(exclude=*) ;&
 		(exclude)
 			opt='x'
 			;;
 
-		(grep-flags=*)
+		(grep-flags=*) ;&
 		(grep-flags)
 			opt='g'
 			;;
@@ -266,7 +262,7 @@ while getopts $optstr opt "$@"; do
 		esac
 
 		if [ -n `expr $optstr : ".*\($opt:\)"` ]; then
-			if [ -n "${OPTARG#*=}" ]; then
+			if [[ $OPTARG =~ .*=.* ]]; then
 				OPTARG="${OPTARG#*=}"
 			else
 				shift
@@ -278,10 +274,6 @@ while getopts $optstr opt "$@"; do
 	case "$opt" in
 	(d)
 		dir="`sed -e's/\*$//; s/\/$//' <<<"${OPTARG}"`"
-		;;
-
-	(h)
-		dir="$PWD"
 		;;
 
 	(r)
