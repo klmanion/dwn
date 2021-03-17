@@ -21,7 +21,7 @@ declare skip_expr=""
 declare -a rng_arr
 
 declare pat_flg=0
-declare pat_len
+declare pat_len=1
 declare neg_flg=0
 declare dash_flg=0
 declare num_flg=0
@@ -61,7 +61,132 @@ err() {
 }
 
 # Skip expression {{{2
+
 parse_skip_expr() {
+	local prf suf hi lo
+
+	test -z "$skip_expr" && return;
+
+	prf="`sed -e's_^\([:^]*\).*_\1_' <<<"${skip_expr}"`"
+	suf="`sed -e's_^[:^]*\(.*\)_\1_' <<<"${skip_expr}"`"
+
+	if [ -n "`sed -e's_[-0-9\$, ]__g' <<<"${suf}"`" ]; then
+		err 'Invalid character(s) in skip expression'
+	fi
+
+	for (( i=0; i<${#prf}; ++i )); do
+		case "${prf:i:1}" in
+			(:)
+				pat_flg=1
+#				test $num_files -eq 1 && num_files=0
+				;;
+			(^)
+				neg_flg=1
+#				test $num_files -eq 1 && num_files=0
+				;;
+		esac
+	done
+
+	test $num_files -eq 1 && num_files=0
+
+	# DEBUG
+	if [ $pat_flg -eq 1 ]; then
+		echo "pattern flag enabled"
+	else
+		echo "pattern flag disabled"
+	fi
+
+	if [ $neg_flg -eq 1 ]; then
+		echo "negation flag enabled"
+	else
+		echo "negation flag disabled"
+	fi
+
+	printf 'fnum:\t%s\n' $num_files
+
+	local IFS=', '
+	read -r -a rng_arr <<<"${suf}"
+
+	# sanitize ranges
+	# and find highest upper bound
+	for (( i=0; i<${#rng_arr[@]}; ++i )); do
+		rng=${rng_arr[i]}
+
+		if [[ $rng =~ [0-9]+-[0-9\$]* ]]; then
+			lo="${rng%-*}"
+			hi="${rng#*-}"
+			test -z $hi && hi=0
+		elif [[ $rng =~ -[0-9]+ ]]; then
+			lo=1
+			hi="${rng#*-}"
+		elif [[ $rng =~ [0-9]+ ]]; then
+			let "hi = lo = rng"
+		else	# shouldn't happen
+			err 'bad expression passed to `-S'\'
+		fi
+
+		test $lo -eq 0 && err 'cannot set 0 as lower bound'
+		test x"$hi" = x"\$" && hi=0
+
+		if [ $pat_len -ne 0 ]; then
+			if [ $hi -eq 0 ]; then
+				pat_len=0
+			else
+				test $hi -gt $pat_len && pat_len=$hi
+			fi
+		fi
+
+		rng_arr[i]="$lo-$hi"
+		#DEBUG
+		echo "inserting ${rng_arr[i]} at $i"
+	done
+}
+
+skip_dex() {
+	local dex hi lo
+
+	test -z "$skip_expr" && return 0;
+
+	dex=$1
+	if [[ $pat_flg -eq 1 && $pat_len -gt 0 ]]; then
+		let "dex %= pat_len"
+	fi
+	let "dex += 1"
+
+	for rng in ${rng_arr[@]}; do
+		lo="${rng%-*}"
+		hi="${rng#*-}"
+
+		#DEBUG
+		echo "rng:"$'\t'"$rng"
+		echo "lo:"$'\t'"$lo"
+		echo "hi:"$'\t'"$hi"
+
+		test -z $lo && lo=0
+		test -z $hi && hi=0
+
+		if [ $hi -eq 0 ]; then
+			if [ $dex -ge $lo ]; then
+				echo "$lo <= $dex <= $hi -> $((! neg_flg))"
+				echo
+				return $((! neg_flg));
+			fi
+		elif [[ $lo -le $dex && $dex -le $hi ]]; then
+			#DEBUG
+			echo "$lo <= $dex <= $hi -> $((! neg_flg))"
+			echo
+			return $((! neg_flg));
+		fi
+	done
+
+	#DEBUG
+	echo "$lo <= $dex <= $hi -> $neg_flg"
+	echo
+	return $neg_flg;
+}
+
+# Skip expression {{{2
+__retired__parse_skip_expr() {
 	local saved suf hi lo
 
 	let "pat_flg = neg_flg = dash_flg = 0"
@@ -132,7 +257,7 @@ parse_skip_expr() {
 }
 
 # returns arithmetic boolean
-skip_dex() {
+__retired__skip_dex() {
 	local dex hi lo
 
 	test -z "$skip_expr" && return 0;
@@ -427,8 +552,12 @@ filepath_lst="`tr '\n' '\t' <<<"${filepath_lst}"`"
 read -r -a filepath_arr <<<"${filepath_lst}"
 
 len=${#filepath_arr[@]}
+printf 'num:\t%s\n\n' $num_files #DEBUG
 for (( dex=0,ct=0; dex<len && (num_files==0 || ct<num_files); ++dex )); do
 	filepath="${filepath_arr[$dex]}"
+	#DEBUG
+	echo "dex:"$'\t'"$dex"
+	echo "ct:"$'\t'"$ct"
 
 	test -z "$filepath" && err 'stat command failed'
 
@@ -441,6 +570,7 @@ for (( dex=0,ct=0; dex<len && (num_files==0 || ct<num_files); ++dex )); do
 
 	eval $cmd $cmd_flgs "$filename" $cmd_post
 	test -n "$print_delim" && echo -n "$print_delim"
+	echo #DEBUG
 
 	let "++ct"
 done
