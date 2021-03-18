@@ -15,6 +15,7 @@ declare print_delim=""
 
 declare dir=""
 declare num_files=1
+declare num_scan=0
 
 declare skip_expr=""
 
@@ -188,7 +189,7 @@ skip_dex() {
 # Main script {{{1
 
 # Option parsing {{{2
-declare optstr=":-:d:hrR:n:Nf:om:MS:s:e:x:g:hV" 
+declare optstr=":-:d:hrR:n:t:Nf:om:MS:s:e:x:g:hV" 
 while getopts $optstr opt "$@"; do
 	if [ x"$opt" = x"-" ]; then
 		test -z "$OPTARG" && break
@@ -208,9 +209,14 @@ while getopts $optstr opt "$@"; do
 			opt='R'
 			;;
 
-		(repetitions=*) ;&
-		(repetitions)
+		(results=*) ;&
+		(results)
 			opt='n'
+			;;
+
+		(total-scanned=*) ;&
+		(total-scanned)
+			opt='t'
 			;;
 
 		(number) ;&
@@ -310,10 +316,18 @@ while getopts $optstr opt "$@"; do
 
 	(n)
 		num_files="$OPTARG"
-		test -n "`echo "$num_files" | sed -e 's/[0-9]*//'`" \
+		test -n "`echo "$num_files" | sed -e's/[0-9]*//'`" \
 			&& err '-n takes only numeric arguments'
 		test "$num_files" -lt 0 \
-			&& err 'number of files must be set to at least 0' 
+			&& err 'number of resultant files must be at least 0' 
+		;;
+
+	(t)
+		num_scan="$OPTARG"
+		test -n "`echo "$num_scan" | sed -e's/[0-9]*//'`" \
+			&& err '-t takes only numeric arguments'
+		test "$num_scan" -lt 0 \
+			&& err 'number of scanned files must be at least 0'
 		;;
 
 	(N)
@@ -437,6 +451,10 @@ filepath_lst="`tr '\n' '\t' <<<"${filepath_lst}"`"
 read -r -a filepath_arr <<<"${filepath_lst}"
 
 len=${#filepath_arr[@]}
+if [ $num_scan -gt 0 ]; then
+	test $len -gt $num_scan && len=$num_scan
+fi
+
 printf 'num:\t%s\n\n' $num_files #DEBUG
 for (( dex=0,ct=0; dex<len && (num_files==0 || ct<num_files); ++dex )); do
 	filepath="${filepath_arr[$dex]}"
