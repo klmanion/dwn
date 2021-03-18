@@ -15,7 +15,8 @@
 .Nm
 .Op Ar action
 .Op Fl d Ar directory
-.Op Fl n Ar num_files
+.Op Fl n Ar num_results
+.Op Fl t Ar num_scanned
 .Op Fl f Ar flags
 .Nm
 .Op Ar action
@@ -52,8 +53,8 @@ commands;
 these actions are listed in the first synopsis line.
 The following synopsis lines group options that control the way
 .Nm
-functions, and may be used with any of the actions enumerated in the first
-synopsis line.
+functions, and may be used with or without any of the actions enumerated in
+the first synopsis line.
 .Pp
 Open the obtained filepaths with \fB\-o\fR.
 Move the obtained filepaths to a specified directory with \fB\-m\fR.
@@ -79,7 +80,12 @@ Any character whatsoever may be specified as the delimiter used for output with
 The third synopsis line contains the options that control how the filepath is
 obtained.
 A directory other than the default may be specified with \fB\-d\fR.
-The number of files to obtain may be specified with \fB\-n\fR.
+The number of files obtained from the scan may be specified with \fB\-n\fR.
+The number of files scanned may be limited by \fB\-t\fR.
+The latter limits the extension of the domain,
+how many files in directory are relevant;
+whereas, the former limits the extension of the range,
+the number of results to produce.
 Additional flags to be passed to the underlying command of the action form
 before the filepath itself may be specified with \fB\-f\fR.
 .Pp
@@ -87,7 +93,7 @@ The fourth synopsis line contains the options that allow one to skip over
 certain files.
 The \fB\-s\fR option, which is a convenience form for the more comprehensive
 \fB\-S\fR option, takes a number and skips that many files that would have been
-obtained.
+scanned.
 This is useful for when one wishes to obtain a filepath or sequence of
 filepaths that had been the most recent in a directory,
 but, since then, have been pushed back by newer files.
@@ -146,6 +152,9 @@ obtains the specified number of files.
 If there are less than that number of files in the directory
 .Nm
 obtains what is available.
+.It Fl t Ar num , Fl Fl total-scanned Ns = Ns num
+Given a numeric argument, scan only this number of files in the directory
+rather than the whole directory.
 .It Fl f Ar flags , Fl Fl flags Ns = Ns Ar flags
 The string of options and flags following \fB\-f\fR are passed to the command
 .Nm
@@ -205,6 +214,9 @@ A selection of uses are:
 See the
 .Xr grep 1
 manpage for a full listing of options which may be passed to grep.
+.It Fl N , Fl Fl number-files , Fl Fl number
+Prepend a number indexing the results,
+0-indexed.
 .El
 .Sh EXAMPLES
 Print out the filepath most recently added to the desktop:
